@@ -83,16 +83,19 @@ const GenerateDialogues = () => {
       >
         <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
         <p className="text-lg text-gray-800 font-semibold">Dialogues</p>
-          <p style={{}}>Select Scene</p>
-          <Slider
-            style={{ minWidth: "100px", flexGrow: 1 }}
-            step={1}
-            value={currentScene}
-            valueLabelDisplay="auto"
-            min={MIN}
-            max={maxScenes}
-            onChange={handleSceneChange}
-          />
+        <div className="flex items-center gap-2">
+  <p className="text-base font-medium">Select Scene</p>
+  <input
+    className="min-w-[100px] flex-grow h-2 bg-purple-700 rounded-lg appearance-none cursor-pointer dark:bg-blue-700"
+    type="range"
+    step="1"
+    value={currentScene}
+    min={MIN}
+    max={maxScenes}
+    onChange={handleSceneChange}
+  />
+</div>
+
         </div>
 
 <button

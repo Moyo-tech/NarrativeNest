@@ -506,9 +506,9 @@ export default function App() {
               <FiMenu size="1rem" className="h-6 w-6" />
             )}
           </button>
-          <h1 className="flex-1 text-center text-base font-normal">
+          <h3 className="flex-1 text-center text-sm font-medium">
             NarrativeNest
-          </h1>
+          </h3>
           <button type="button" className="px-3" onClick={onMobileLeftClick}>
             {(isNavOpen || isChatOpen) && (
               <FiX size="1rem" className="h-6 w-6" />
@@ -544,10 +544,10 @@ export default function App() {
             >
               <div className="lg:p-4">
               <Link href="/">
-                <h1 className="text-4xl font-semibold pb-2">NarrativeNest</h1>
+                <h1 className="text-3xl font-semibold pb-2">NarrativeNest</h1>
               </Link>
               {/* <p>SQL Workbench like editor for AI. Tired of starting new conversation for each thing you're writing?</p> */}
-              <div className="mb-6 text-xs">Workbench for ChatGPT</div>
+              <div className="mb-6 text-xs">Revolutionizing Nollywood Narratives</div>
               
               <a
                 onClick={onCreateDoc}
