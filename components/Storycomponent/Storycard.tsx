@@ -10,7 +10,6 @@ import ArrowBackIosNewRoundedIcon from "@mui/icons-material/ArrowBackIosNewRound
 import ArrowForwardIosRoundedIcon from "@mui/icons-material/ArrowForwardIosRounded";
 import TextField from "@mui/material/TextField";
 
-
 // Define a type for the props
 interface StorycardProps {
   title: string;
@@ -37,9 +36,11 @@ const Storycard: React.FC<StorycardProps> = ({
         sx={{
           height: "auto",
           borderRadius: "10px",
-          bgcolor: "rgba(113, 131, 155, 0.5)",
+          bgcolor: "rgb(229 231 235)",
           padding: "20px",
           marginBottom: "20px",
+          boxShadow:
+            "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)",
         }}
       >
         <div
@@ -56,11 +57,21 @@ const Storycard: React.FC<StorycardProps> = ({
               fontSize: "16px",
               textTransform: "inherit",
               fontWeight: "bold",
+              textDecoration: 'underline'
             }}
           >
             {title}
           </Button>
-          <div
+
+          <Button
+            variant="outlined"
+            color="primary"
+            size="small"
+            style={{ fontSize: "11px", borderRadius: "10px" }}
+          >
+            Generate
+          </Button>
+          {/* <div
             className="storycard-buttons"
             style={{
               display: "flex",
@@ -95,7 +106,7 @@ const Storycard: React.FC<StorycardProps> = ({
                 <ArrowForwardIosRoundedIcon />{" "}
               </IconButton>
             </div>
-          </div>
+          </div> */}
         </div>
 
         <TextField
@@ -111,23 +122,6 @@ const Storycard: React.FC<StorycardProps> = ({
             },
           }}
         />
-
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "flex-end",
-            marginTop: "20px",
-          }}
-        >
-          <Button
-            variant="outlined"
-            color="primary"
-            size="small"
-            style={{ fontSize: "11px", borderRadius: "10px" }}
-          >
-            Generate
-          </Button>
-        </div>
       </Box>
     </>
   );

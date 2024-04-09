@@ -42,10 +42,8 @@ const SiderbarLeft: React.FC = () => {
   };
 
   return (
-    <div style={{ marginTop: "20px", marginBottom: "20px" }}>
-      <p style={{ fontSize: "12px" }}>
-        Generate your story from your logline
-      </p>
+    <div style={{ marginTop: "40px", marginBottom: "20px" }} className="text-xs">
+      <p className="text-md">Generate your story from your logline</p>
       <Divider style={{ marginTop: "20px", marginBottom: "20px" }} />
       <p
         style={{ fontSize: "14px", fontWeight: "bold", paddingBottom: "10px" }}
@@ -59,7 +57,8 @@ const SiderbarLeft: React.FC = () => {
         rows={4}
         value={logline}
         onChange={handleLoglineChange}
-        style={{ marginBottom: "20px", borderRadius: "10px" }}
+        className="w-full"
+        style={{ marginBottom: "20px", borderRadius: "10px", borderColor: 'black' }}
       />
       <FormControl fullWidth>
         <InputLabel id="demo-simple-select-label">Genre</InputLabel>
@@ -70,28 +69,20 @@ const SiderbarLeft: React.FC = () => {
           value={genrePrefix}
           onChange={handleGenrePrefixChange}
           label="Age"
-          style={{ borderRadius: "10px" }}
+          style={{ borderRadius: "10px", fontSize: 14 }}
         >
           <MenuItem value="medea_prefixes">Medea Prefix</MenuItem>
           <MenuItem value="scifi_prefixes">Sci-fi Prefix</MenuItem>
           <MenuItem value="custom_prefixes">Custom Prefix</MenuItem>
         </Select>
       </FormControl>
-      <div>
-        <Button
-          variant="outlined"
-          style={{
-            fontStyle: "initial",
-            fontSize: "11px",
-            marginTop: "20px",
-            marginRight: "10px",
-            borderRadius: "10px",
-          }}
-          onClick={handleStoryGeneration}
-        >
-          Write
-        </Button>
-      </div>
+
+      <button
+        onClick={handleStoryGeneration}
+        className="mt-4 text-xs w-full text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700"
+      >
+        Write
+      </button>
     </div>
   );
 };

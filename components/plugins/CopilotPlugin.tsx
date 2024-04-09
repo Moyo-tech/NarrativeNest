@@ -200,7 +200,7 @@ function Conversation ({item, index, onChatUpdate, addText, setting}){
       }
     }, [textAreaRef.current, reply]);
 
-  return (<div key={index} className="p-2 mb-4 hover:bg-gray-100 text-gray-500 hover:text-gray-900 bg-gray-50 rounded">
+  return (<div key={index} className="h-full p-2 hover:bg-gray-100 text-gray-500 hover:text-gray-900 bg-gray-50 rounded">
       
       {renderIcon(item.task)}
       

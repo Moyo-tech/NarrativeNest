@@ -10,7 +10,7 @@ import RenderStory from "./Storycomponent/RenderStory";
 
 const Storycomponent = () => {
   return (
-    <>
+    <div className="mt-4">
         <GenerateTitle />
         <CharacterComp />
         <GeneratePlot />
@@ -18,7 +18,7 @@ const Storycomponent = () => {
         <GenerateDialogues />
         <RenderStory />
 
-    </>
+    </div>
   )
 };
 
