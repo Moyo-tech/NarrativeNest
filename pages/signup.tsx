@@ -29,6 +29,7 @@ export default function SignUp() {
                   id="firstName"
                   placeholder="First Name"
                   className="border outline-none sm:text-sm rounded-lg block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-white focus:border-white"
+                  required
                 />
               </div>
 
@@ -45,6 +46,7 @@ export default function SignUp() {
                   id="lastName"
                   placeholder="Last Name"
                   className="border outline-none sm:text-sm rounded-lg block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-white focus:border-white"
+                  required
                 />
               </div>
 
@@ -61,6 +63,7 @@ export default function SignUp() {
                   id="email"
                   className="border outline-none sm:text-sm rounded-lg block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-white focus:border-white"
                   placeholder="name@company.com"
+                  required
                 />
               </div>
 
@@ -76,6 +79,7 @@ export default function SignUp() {
                   name="password"
                   placeholder="Password"
                   className="border outline-none sm:text-sm rounded-lg block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-white focus:border-white"
+                  required
                 />
               </div>
 
@@ -88,6 +92,7 @@ export default function SignUp() {
                 </label>
                 <select
                   id="countries"
+                  required
                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                 >
                   <option selected>Choose a role</option>
@@ -101,7 +106,7 @@ export default function SignUp() {
 
               <button
                 type="submit"
-                className="w-full text-white bg-blue-700 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+                className="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
               >
                 Sign Up
               </button>
