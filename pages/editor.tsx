@@ -16,6 +16,7 @@ import { TRANSFORMERS } from "@lexical/markdown";
 import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import ActionsPlugin from "../components/plugins/ActionsPlugin";
 import CodeHighlightPlugin from "../components/plugins/CodeHighlightPlugin";
+import AddIcon from '@mui/icons-material/Add';
 import prepopulatedText from "../components/plugins/SampleText";
 import CopilotPlugin from "../components/plugins/CopilotPlugin";
 import DraggableBlockPlugin from "../components/plugins/DraggableBlockPlugin";
@@ -143,10 +144,11 @@ function Editor({
   };
 
   return (
+    // <div className="flex flex-col h-full">
     <div className="w-full flex">
       <LexicalComposer initialConfig={editorConfig}>
         <PanelGroup direction="horizontal">
-          <Panel className="editor-inner w-full lg:w-3/5 p-4">
+          <Panel className="editor-inner w-full lg:w-3/5 p-4 ">
             <div className="editor-container  min-h-full">
               <ToolbarPlugin
                 setting={setting}
@@ -198,7 +200,7 @@ function Editor({
             className={
               isChatOpen
                 ? "p-4 bg-white h-screen z-1 absolute w-full"
-                : "hidden lg:block lg:p-4 lg:w-2/5 lg:overflow-scroll lg:h-screen"
+                : "hidden lg:block ml-4 lg:w-2/5  lg:overflow-scroll lg:h-screen"
             }
             style={{ overflow: "auto" }}
           >
@@ -211,6 +213,7 @@ function Editor({
         </PanelGroup>
       </LexicalComposer>
     </div>
+    // </div>
   );
 }
 
@@ -500,7 +503,9 @@ export default function App() {
               <FiMenu size="1rem" className="h-6 w-6" />
             )}
           </button>
-          <h1 className="flex-1 text-center text-base font-normal">NarrativeNest</h1>
+          <h1 className="flex-1 text-center text-base font-normal">
+            NarrativeNest
+          </h1>
           <button type="button" className="px-3" onClick={onMobileLeftClick}>
             {(isNavOpen || isChatOpen) && (
               <FiX size="1rem" className="h-6 w-6" />
@@ -511,8 +516,9 @@ export default function App() {
           </button>
         </div>
 
-        <div className="flex">
-          <Modal
+        <div className="bg-slate-300 flex flex-col h-screen overflow-hidden">
+          <div className="flex h-full">
+            <Modal
             title="Settings"
             isOpen={isSettingsOpen}
             setIsOpen={setIsSettingsOpen}
@@ -524,96 +530,101 @@ export default function App() {
             />
           </Modal>
 
-          {/* */}
-          <div
-            className={
-              isNavOpen
-                ? "w-full z-10 p-4 border-r border-gray-200 shadow-md h-screen overflow-y-auto"
-                : "hidden lg:p-4 lg:flex lg:flex-col lg:w-1/5 lg:shadow-md h-screen overflow-y-auto"
-            }
-          >
-            <Link href="/">
-              <h1 className="text-4xl font-semibold pb-2">NarrativeNest</h1>
-            </Link>
-            {/* <p>SQL Workbench like editor for AI. Tired of starting new conversation for each thing you're writing?</p> */}
-            <div className="pb-4">Workbench for ChatGPT</div>
-            <a
-              onClick={onCreateDoc}
-              className="flex p-3 items-center gap-3 transition-colors duration-200 cursor-pointer rounded-md border border-gray-200 hover:bg-gray-200 mb-1 flex-shrink-0"
+            {/* */}
+            <div
+              className={`
+                ${isNavOpen
+                  ? "w-full z-10 p-4 border-r border-gray-200 shadow-md h-screen overflow-y-auto"
+                  : "hidden lg:flex lg:flex-col lg:shadow-md h-screen overflow-y-auto"} bg-white w-full min-w-[200px] max-w-[260px] justify-between`
+              }
             >
-              New doc
-            </a>
-            <ol className="">
-              {docs.map((item, i) => (
-                <li key={item.id}>
-                  <a
-                    onClick={() => onSelectDoc(item.id)}
-                    className="flex p-3 gap-3 items-center relative group rounded-md cursor-pointer break-all text-gray-900 hover:bg-gray-100 "
-                  >
-                    {item.title}
-                  </a>
-                </li>
-              ))}
-            </ol>
+              <div className="lg:p-4">
+              <Link href="/">
+                <h1 className="text-4xl font-semibold pb-2">NarrativeNest</h1>
+              </Link>
+              {/* <p>SQL Workbench like editor for AI. Tired of starting new conversation for each thing you're writing?</p> */}
+              <div className="mb-6 text-xs">Workbench for ChatGPT</div>
+              
+              <a
+                onClick={onCreateDoc}
+                className="flex justify-between items-center text-xs p-3 items-center gap-3 transition-colors duration-200 cursor-pointer rounded-md border bg-gray-800 text-white hover:opacity-80 mb-1 flex-shrink-0"
+              >
+                Create New 
+                <AddIcon style={{fontSize: 14}}/>
+              </a>
+              <ol className="">
+                {docs.map((item, i) => (
+                  <li key={item.id} className="mb-2">
+                    <a
+                      onClick={() => onSelectDoc(item.id)}
+                      className="flex text-xs p-3 gap-3 items-center relative group rounded-md cursor-pointer break-all text-gray-900 bg-gray-300 hover:opacity-80"
+                    >
+                      {item.title}
+                    </a>
+                  </li>
+                ))}
+              </ol>
 
-            <SiderbarLeft />
-            <div className="flex-col flex-1 border-t border-white/2 pt-2 mt-2">
-              <a
-                onClick={onExport}
-                className="flex p-3 gap-3 items-center relative group rounded-md cursor-pointer break-all text-gray-900 hover:bg-gray-100 "
-              >
-                <FiDownload /> Export
-              </a>
-              <input
-                id="import-file"
-                className="sr-only"
-                tabindex="-1"
-                type="file"
-                accept=".json"
-                onChange={onImportChange}
-              />
-              <a
-                onClick={() => {
-                  const importFile = document.querySelector(
-                    "#import-file"
-                  ) as HTMLInputElement;
-                  if (importFile) {
-                    importFile.click();
-                  }
-                }}
-                className="flex p-3 gap-3 items-center relative group rounded-md cursor-pointer break-all text-gray-900 hover:bg-gray-100 "
-              >
-                <FiUpload /> Import
-              </a>
-              <a
-                onClick={(e) => setIsSettingsOpen(true)}
-                className="flex p-3 gap-3 items-center relative group rounded-md cursor-pointer break-all text-gray-900 hover:bg-gray-100 "
-              >
-                <FiSettings /> Settings
-              </a>
+              <SiderbarLeft />
+              </div>
+              <div className="border-t border-white/2 pb-4">
+                <a
+                  onClick={onExport}
+                  className="flex p-3 gap-3 items-center relative group rounded-md cursor-pointer break-all text-gray-900 hover:bg-gray-100 "
+                >
+                  <FiDownload /> Export
+                </a>
+                <input
+                  id="import-file"
+                  className="sr-only"
+                  tabindex="-1"
+                  type="file"
+                  accept=".json"
+                  onChange={onImportChange}
+                />
+                <a
+                  onClick={() => {
+                    const importFile = document.querySelector(
+                      "#import-file"
+                    ) as HTMLInputElement;
+                    if (importFile) {
+                      importFile.click();
+                    }
+                  }}
+                  className="flex p-3 gap-3 items-center relative group rounded-md cursor-pointer break-all text-gray-900 hover:bg-gray-100 "
+                >
+                  <FiUpload /> Import
+                </a>
+                <a
+                  onClick={(e) => setIsSettingsOpen(true)}
+                  className="flex p-3 gap-3 items-center relative group rounded-md cursor-pointer break-all text-gray-900 hover:bg-gray-100 "
+                >
+                  <FiSettings /> Settings
+                </a>
+              </div>
             </div>
+
+            {currentDoc !== null && !isNavOpen && (
+              <div className="ml-5 my-5 pr-5 pb-5 h-full w-full overflow-y-auto">
+                <Editor
+                  key={currentDoc.id}
+                  editorState={editorState}
+                  onCreateChat={onCreateChat}
+                  onChange={onChange}
+                  history={history}
+                  onChatUpdate={onChatUpdate}
+                  onTitleChange={onTitleChange}
+                  dtitle={currentDoc.title}
+                  isChatOpen={isChatOpen}
+                  setIsChatOpen={setIsChatOpen}
+                  isMobile={isMobile}
+                  setIsPromptsOpen={setIsPromptsOpen}
+                  setting={setting}
+                />
+                <Storycomponent />
+              </div>
+            )}
           </div>
-
-          {currentDoc !== null && !isNavOpen && (
-            <div className="ml-5">
-              <Editor
-                key={currentDoc.id}
-                editorState={editorState}
-                onCreateChat={onCreateChat}
-                onChange={onChange}
-                history={history}
-                onChatUpdate={onChatUpdate}
-                onTitleChange={onTitleChange}
-                dtitle={currentDoc.title}
-                isChatOpen={isChatOpen}
-                setIsChatOpen={setIsChatOpen}
-                isMobile={isMobile}
-                setIsPromptsOpen={setIsPromptsOpen}
-                setting={setting}
-              />
-              <Storycomponent />
-            </div>
-          )}
         </div>
       </div>
     </TitleProvider>

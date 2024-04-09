@@ -77,9 +77,11 @@ const GenerateDialogues = () => {
       sx={{
         height: "auto",
         borderRadius: "10px",
-        bgcolor: "rgba(113, 131, 155, 0.5)",
+        bgcolor: "rgb(229 231 235)",
         padding: "20px",
         marginBottom: "20px",
+        boxShadow:
+        "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)",
       }}
     >
       <div
