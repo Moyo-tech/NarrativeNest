@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   SELECTION_CHANGE_COMMAND,
   FORMAT_TEXT_COMMAND,
+  FORMAT_ELEMENT_COMMAND,
   $getSelection,
   $isRangeSelection,
   $createParagraphNode,
@@ -13,7 +14,7 @@ $createRangeSelection
 
 import { ActionIconMap } from "@/types/data";
 
-import { BsTypeBold, BsTypeItalic, BsTypeUnderline, BsTypeStrikethrough, BsTypeH1, BsTypeH2, BsListUl, BsListOl, BsCode, BsLink, BsQuote, BsTextParagraph} from 'react-icons/bs';
+import { BsTypeBold, BsTypeItalic, BsTypeUnderline, BsTypeStrikethrough, BsTypeH1, BsTypeH2, BsListUl, BsListOl, BsCode, BsLink, BsQuote, BsTextParagraph, BsTextLeft,  BsTextRight, BsTextCenter, BsJustify} from 'react-icons/bs';
 
 import { $isLinkNode, TOGGLE_LINK_COMMAND } from "@lexical/link";
 import { $wrapNodes, $isAtNodeEnd } from "@lexical/selection";
@@ -53,6 +54,7 @@ const supportedBlockTypes = new Set([
   "code",
   "h1",
   "h2",
+  "h3",
   "ul",
   "ol"
 ]);
@@ -335,50 +337,6 @@ function BlockOptionsDropdownList({
     setShowBlockOptionsDropDown(false);
   };
 
-  const formatBulletList = () => {
-    if (blockType !== "ul") {
-      editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND);
-    } else {
-      editor.dispatchCommand(REMOVE_LIST_COMMAND);
-    }
-    setShowBlockOptionsDropDown(false);
-  };
-
-  const formatNumberedList = () => {
-    if (blockType !== "ol") {
-      editor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND);
-    } else {
-      editor.dispatchCommand(REMOVE_LIST_COMMAND);
-    }
-    setShowBlockOptionsDropDown(false);
-  };
-
-  const formatQuote = () => {
-    if (blockType !== "quote") {
-      editor.update(() => {
-        const selection = $getSelection();
-
-        if ($isRangeSelection(selection)) {
-          $wrapNodes(selection, () => $createQuoteNode());
-        }
-      });
-    }
-    setShowBlockOptionsDropDown(false);
-  };
-
-  const formatCode = () => {
-    if (blockType !== "code") {
-      editor.update(() => {
-        const selection = $getSelection();
-
-        if ($isRangeSelection(selection)) {
-          $wrapNodes(selection, () => $createCodeNode());
-        }
-      });
-    }
-    setShowBlockOptionsDropDown(false);
-  };
-
   return (
     <div className="dropdown" ref={dropDownRef}>
       <button className="item" onClick={formatParagraph}>
@@ -399,30 +357,6 @@ function BlockOptionsDropdownList({
         <span className="text">Small Heading</span>
         {blockType === "h2" && <span className="active" />}
       </button>
-      <button className="item" onClick={formatBulletList}>
-        {/* <span className="icon bullet-list" /> */}
-        <span className="icon"><BsListUl/></span>
-        <span className="text">Bullet List</span>
-        {blockType === "ul" && <span className="active" />}
-      </button>
-      <button className="item" onClick={formatNumberedList}>
-        {/* <span className="icon numbered-list" /> */}
-        <span className="icon"><BsListOl/></span>
-        <span className="text">Numbered List</span>
-        {blockType === "ol" && <span className="active" />}
-      </button>
-      <button className="item" onClick={formatQuote}>
-        {/* <span className="icon quote" /> */}
-        <span className="icon"><BsQuote/></span>
-        <span className="text">Quote</span>
-        {blockType === "quote" && <span className="active" />}
-      </button>
-      <button className="item" onClick={formatCode}>
-        {/* <span className="icon code" /> */}
-        <span className="icon"><BsCode/></span>
-        <span className="text">Code Block</span>
-        {blockType === "code" && <span className="active" />}
-      </button>
     </div>
   );
 }
@@ -439,9 +373,8 @@ export default function ToolbarPlugin({setting, onCreateChat, setIsChatOpen, isM
   const [isLink, setIsLink] = useState(false);
   const [isBold, setIsBold] = useState(false);
   const [isItalic, setIsItalic] = useState(false);
-  const [isUnderline, setIsUnderline] = useState(false);
-  const [isStrikethrough, setIsStrikethrough] = useState(false);
-  const [isCode, setIsCode] = useState(false);
+  const [isLeft, setIsLeft] = useState(false);
+
 
   const updateToolbar = useCallback(() => {
     const selection = $getSelection();
@@ -472,9 +405,6 @@ export default function ToolbarPlugin({setting, onCreateChat, setIsChatOpen, isM
       // Update text format
       setIsBold(selection.hasFormat("bold"));
       setIsItalic(selection.hasFormat("italic"));
-      setIsUnderline(selection.hasFormat("underline"));
-      setIsStrikethrough(selection.hasFormat("strikethrough"));
-      setIsCode(selection.hasFormat("code"));
 
       // Update links
       const node = getSelectedNode(selection);
@@ -505,28 +435,6 @@ export default function ToolbarPlugin({setting, onCreateChat, setIsChatOpen, isM
     );
   }, [editor, updateToolbar]);
 
-  const codeLanguges = useMemo(() => getCodeLanguages(), []);
-  const onCodeLanguageSelect = useCallback(
-    (e) => {
-      editor.update(() => {
-        if (selectedElementKey !== null) {
-          const node = $getNodeByKey(selectedElementKey);
-          if ($isCodeNode(node)) {
-            node.setLanguage(e.target.value);
-          }
-        }
-      });
-    },
-    [editor, selectedElementKey]
-  );
-
-  const insertLink = useCallback(() => {
-    if (!isLink) {
-      editor.dispatchCommand(TOGGLE_LINK_COMMAND, "https://");
-    } else {
-      editor.dispatchCommand(TOGGLE_LINK_COMMAND, null);
-    }
-  }, [editor, isLink]);
 
 
   
@@ -583,10 +491,6 @@ export default function ToolbarPlugin({setting, onCreateChat, setIsChatOpen, isM
       "paragraph": BsTextParagraph,
       "h1": BsTypeH1,
       "h2": BsTypeH2,
-      "ul": BsListUl,
-      "ol": BsListOl,
-      "quote": BsQuote,
-      "code": BsCode,
     }
     const Icon = mapping[icon];
     return (<Icon />);
@@ -657,45 +561,40 @@ export default function ToolbarPlugin({setting, onCreateChat, setIsChatOpen, isM
             {/* <i className="format italic" /> */}
             <i className="format"><BsTypeItalic/></i>
           </button>
+
           <button
             onClick={() => {
-              editor.dispatchCommand(FORMAT_TEXT_COMMAND, "underline");
+              editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "left");
             }}
-            className={"toolbar-item spaced " + (isUnderline ? "active" : "")}
-            aria-label="Format Underline"
-          >
-            {/* <i className="format underline" /> */}
-            <i className="format"><BsTypeUnderline/></i>
-          </button>
-          <button
-            onClick={() => {
-              editor.dispatchCommand(FORMAT_TEXT_COMMAND, "strikethrough");
-            }}
-            className={
-              "toolbar-item spaced " + (isStrikethrough ? "active" : "")
-            }
-            aria-label="Format Strikethrough"
-          >
-            {/* <i className="format strikethrough" /> */}
-            <i className="format"><BsTypeStrikethrough/></i>
-          </button>
-          <button
-            onClick={() => {
-              editor.dispatchCommand(FORMAT_TEXT_COMMAND, "code");
-            }}
-            className={"toolbar-item spaced " + (isCode ? "active" : "")}
-            aria-label="Insert Code"
+            className={"toolbar-item spaced " + (isLeft ? "active" : "")}
+            aria-label="Align Right"
           >
             {/* <i className="format code" /> */}
-            <i className="format"><BsCode/></i>
+            <i className="format"><BsTextLeft/></i>
           </button>
           <button
-            onClick={insertLink}
-            className={"toolbar-item spaced " + (isLink ? "active" : "")}
-            aria-label="Insert Link"
+            onClick={() => {
+              editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "right");
+            }}
+            className={"toolbar-item spaced " + (isLeft ? "active" : "")}
+            aria-label="Align Right"
           >
-            <i className="format"><BsLink/></i>
+            {/* <i className="format code" /> */}
+            <i className="format"><BsTextRight/></i>
           </button>
+          <button
+            onClick={() => {
+              editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "center");
+            }}
+            className={"toolbar-item spaced " + (isLeft ? "active" : "")}
+            aria-label="Align Right"
+          >
+            {/* <i className="format code" /> */}
+            <i className="format"><BsTextCenter/></i>
+          </button>
+
+
+     
           {isLink &&
             createPortal(<FloatingLinkEditor editor={editor} />, document.body)}
           <Divider />

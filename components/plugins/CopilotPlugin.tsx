@@ -166,6 +166,12 @@ function Conversation ({item, index, onChatUpdate, addText, setting}){
           break
         }
       }
+    
+      if (!task) {
+        // Handle the case where task is undefined
+        // For example, you can return a default icon or throw an error
+        return;
+      }
       
       let icon = task.id
       if(!ActionIconMap.hasOwnProperty(task.id)){

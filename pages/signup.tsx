@@ -1,4 +1,6 @@
 import React from "react";
+import Link from "next/link";
+
 
 export default function SignUp() {
   return (
@@ -104,20 +106,20 @@ export default function SignUp() {
                 </select>
               </div>
 
-              <button
-                type="submit"
-                className="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+              <Link
+                href="/editor"
+                className="w-full inline-block text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
               >
                 Create account
-              </button>
+              </Link>
               <p className="text-sm font-light text-gray-400">
-                Already have an account?{" "}
-                <a
-                  href="#"
+                Already have an account?
+                <Link
+                  href="/login"
                   className="font-medium hover:underline text-primary-500"
                 >
                   Login
-                </a>
+                </Link>
               </p>
             </form>
           </div>

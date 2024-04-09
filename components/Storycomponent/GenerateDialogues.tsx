@@ -73,17 +73,7 @@ const GenerateDialogues = () => {
     fetchDialogue();
   };
   return (
-    <Box
-      sx={{
-        height: "auto",
-        borderRadius: "10px",
-        bgcolor: "rgb(229 231 235)",
-        padding: "20px",
-        marginBottom: "20px",
-        boxShadow:
-        "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)",
-      }}
-    >
+    <div className="h-auto rounded-lg p-5 mb-5 bg-gradient-to-br from-pink-100 via-purple-200 to-purple-300 shadow-lg">
       <div
         style={{
           display: "flex",
@@ -92,18 +82,8 @@ const GenerateDialogues = () => {
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
-          <Button
-            onClick={handleDialogueGeneration}
-            variant="text"
-            style={{
-              fontSize: "16px",
-              textTransform: "inherit",
-              fontWeight: "bold",
-            }}
-          >
-            Dialogues
-          </Button>
-          <p style={{}}>scene</p>
+        <p className="text-lg text-gray-800 font-semibold">Dialogues</p>
+          <p style={{}}>Select Scene</p>
           <Slider
             style={{ minWidth: "100px", flexGrow: 1 }}
             step={1}
@@ -115,54 +95,19 @@ const GenerateDialogues = () => {
           />
         </div>
 
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "flex-end",
-            gap: "10px",
-          }}
-        >
-          <Button
-            variant="outlined"
-            color="primary"
-            size="small"
-            style={{ fontSize: "11px", borderRadius: "10px" }}
-          >
-            Generate New
-          </Button>
-          <Button
-            variant="outlined"
-            color="primary"
-            size="small"
-            style={{ fontSize: "11px", borderRadius: "10px" }}
-          >
-            Continue
-          </Button>
-
-          <div>
-            <IconButton style={{ fontSize: "11px" }} size="small">
-              <ArrowBackIosNewRoundedIcon />{" "}
-            </IconButton>
-            <IconButton style={{ fontSize: "11px" }} size="small">
-              <ArrowForwardIosRoundedIcon />{" "}
-            </IconButton>
-          </div>
-        </div>
+<button
+  onClick={handleDialogueGeneration}
+  className="text-xs w-auto text-gray-800 bg-white hover:bg-gray-200 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700"
+>
+  Generate
+</button>
       </div>
 
-      <TextField
-        id="outlined-multiline-static"
-        multiline
-        rows={6}
-        fullWidth
-        value={generatedDialogue}
-        sx={{
-          "& .MuiTextField-root	": {
-            borderRadius: "10px",
-            borderColor: "white",
-          },
-        }}
-      />
+      <textarea
+      rows="4"
+      className="w-full p-2 border-2 rounded-xl  focus:border-gray-400 hover:border-gray-400 bg-white"
+      value={generatedDialogue}
+      ></textarea>
 
       <div
         style={{
@@ -170,17 +115,8 @@ const GenerateDialogues = () => {
           justifyContent: "flex-end",
           marginTop: "20px",
         }}
-      >
-        <Button
-          variant="outlined"
-          color="primary"
-          size="small"
-          style={{ fontSize: "11px", borderRadius: "10px" }}
-        >
-          Generate
-        </Button>
-      </div>
-    </Box>
+      ></div>
+    </div>
   );
 };
 

@@ -59,6 +59,9 @@ import Storycomponent from "@/components/Storycomponent";
 import MainAppBar from "@/components/appbar/Mainappbar";
 import { useAppBarContext } from "@/context/AppBarContext";
 import SiderbarLeft from "@/components/SiderbarLeft";
+import Background from "@/components/background/background";
+
+
 
 export function getSavedSettings(): Setting {
   let prevSettings: Setting = DefaultSetting;
@@ -516,7 +519,8 @@ export default function App() {
           </button>
         </div>
 
-        <div className="bg-slate-300 flex flex-col h-screen overflow-hidden">
+        <div className=" flex flex-col h-screen overflow-hidden">
+          <Background />
           <div className="flex h-full">
             <Modal
             title="Settings"

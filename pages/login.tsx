@@ -1,5 +1,6 @@
 import React from "react";
 import { redirect } from "next/navigation";
+import Link from "next/link";
 
 export default function Login() {
   return (
@@ -50,20 +51,20 @@ export default function Login() {
                 />
               </div>
 
-              <button
-                type="submit"
-                className="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+              <Link
+                  href="/editor"
+                  className="w-full inline-block  text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
               >
                 Sign In
-              </button>
+              </Link>
               <p className="text-sm font-light text-gray-400">
-                Don't have an account?{" "}
-                <a
-                  href="#"
+                Don't have an account?
+                <Link
+                  href="/signup"
                   className="font-medium hover:underline text-primary-500"
                 >
                   Sign up
-                </a>
+                </Link>
               </p>
             </form>
           </div>
