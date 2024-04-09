@@ -199,8 +199,8 @@ function Editor({
           <Panel
             className={
               isChatOpen
-                ? "p-4 bg-white h-screen z-1 absolute w-full"
-                : "hidden lg:block ml-4 lg:w-2/5  lg:overflow-scroll lg:h-screen"
+                ? "p-4 bg-white  z-1 absolute w-full"
+                : "hidden lg:block ml-4 lg:w-2/5 "
             }
             style={{ overflow: "auto" }}
           >
