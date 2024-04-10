@@ -16,7 +16,7 @@ import { TRANSFORMERS } from "@lexical/markdown";
 import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import ActionsPlugin from "../components/plugins/ActionsPlugin";
 import CodeHighlightPlugin from "../components/plugins/CodeHighlightPlugin";
-import AddIcon from '@mui/icons-material/Add';
+import AddIcon from "@mui/icons-material/Add";
 import prepopulatedText from "../components/plugins/SampleText";
 import CopilotPlugin from "../components/plugins/CopilotPlugin";
 import DraggableBlockPlugin from "../components/plugins/DraggableBlockPlugin";
@@ -60,8 +60,6 @@ import MainAppBar from "@/components/appbar/Mainappbar";
 import { useAppBarContext } from "@/context/AppBarContext";
 import SiderbarLeft from "@/components/SiderbarLeft";
 import Background from "@/components/background/background";
-
-
 
 export function getSavedSettings(): Setting {
   let prevSettings: Setting = DefaultSetting;
@@ -523,53 +521,56 @@ export default function App() {
           <Background />
           <div className="flex h-full">
             <Modal
-            title="Settings"
-            isOpen={isSettingsOpen}
-            setIsOpen={setIsSettingsOpen}
-          >
-            <Settings
+              title="Settings"
+              isOpen={isSettingsOpen}
               setIsOpen={setIsSettingsOpen}
-              setting={setting}
-              setSetting={setSetting}
-            />
-          </Modal>
+            >
+              <Settings
+                setIsOpen={setIsSettingsOpen}
+                setting={setting}
+                setSetting={setSetting}
+              />
+            </Modal>
 
             {/* */}
             <div
               className={`
-                ${isNavOpen
-                  ? "w-full z-10 p-4 border-r border-gray-200 shadow-md h-screen overflow-y-auto"
-                  : "hidden lg:flex lg:flex-col lg:shadow-md h-screen overflow-y-auto"} bg-white w-full min-w-[200px] max-w-[260px] justify-between`
-              }
+                ${
+                  isNavOpen
+                    ? "w-full z-10 p-4 border-r border-gray-200 shadow-md h-screen overflow-y-auto"
+                    : "hidden lg:flex lg:flex-col lg:shadow-md h-screen overflow-y-auto"
+                } bg-white w-full min-w-[200px] max-w-[260px] justify-between`}
             >
               <div className="lg:p-4">
-              <Link href="/">
-                <h1 className="text-3xl font-semibold pb-2">NarrativeNest</h1>
-              </Link>
-              {/* <p>SQL Workbench like editor for AI. Tired of starting new conversation for each thing you're writing?</p> */}
-              <div className="mb-6 text-xs">Revolutionizing Nollywood Narratives</div>
-              
-              <a
-                onClick={onCreateDoc}
-                className="flex justify-between items-center text-xs p-3 items-center gap-3 transition-colors duration-200 cursor-pointer rounded-md border bg-gray-800 text-white hover:opacity-80 mb-1 flex-shrink-0"
-              >
-                Create New 
-                <AddIcon style={{fontSize: 14}}/>
-              </a>
-              <ol className="">
-                {docs.map((item, i) => (
-                  <li key={item.id} className="mb-2">
-                    <a
-                      onClick={() => onSelectDoc(item.id)}
-                      className="flex text-xs p-3 gap-3 items-center relative group rounded-md cursor-pointer break-all text-gray-900 bg-gray-300 hover:opacity-80"
-                    >
-                      {item.title}
-                    </a>
-                  </li>
-                ))}
-              </ol>
+                <Link href="/">
+                  <h1 className="text-3xl font-semibold pb-2">NarrativeNest</h1>
+                </Link>
+                {/* <p>SQL Workbench like editor for AI. Tired of starting new conversation for each thing you're writing?</p> */}
+                <div className="mb-6 text-xs">
+                  Revolutionizing Nollywood Narratives
+                </div>
 
-              <SiderbarLeft />
+                <a
+                  onClick={onCreateDoc}
+                  className="flex justify-between items-center text-xs p-3 items-center gap-3 transition-colors duration-200 cursor-pointer rounded-md border bg-gray-800 text-white hover:opacity-80 mb-1 flex-shrink-0"
+                >
+                  Create New
+                  <AddIcon style={{ fontSize: 14 }} />
+                </a>
+                <ol className="">
+                  {docs.map((item, i) => (
+                    <li key={item.id} className="mb-2">
+                      <a
+                        onClick={() => onSelectDoc(item.id)}
+                        className="flex text-xs p-3 gap-3 items-center relative group rounded-md cursor-pointer break-all text-gray-900 bg-gray-300 hover:opacity-80"
+                      >
+                        {item.title}
+                      </a>
+                    </li>
+                  ))}
+                </ol>
+
+                <SiderbarLeft />
               </div>
               <div className="border-t border-white/2 pb-4">
                 <a
@@ -610,6 +611,12 @@ export default function App() {
 
             {currentDoc !== null && !isNavOpen && (
               <div className="ml-5 my-5 pr-5 pb-5 h-full w-full overflow-y-auto">
+                <div className="border-b pb-2 border-gray-300">
+                  <div className="flex justify-between items-center px-4">
+                    <p className="text-xl">Editor</p>
+                    <button className="bg-slate-800 text-white px-4 py-2 rounded-md">Visualize</button>
+                  </div>
+                </div>
                 <Editor
                   key={currentDoc.id}
                   editorState={editorState}
