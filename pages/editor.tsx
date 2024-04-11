@@ -614,7 +614,7 @@ export default function App() {
                 <div className="border-b pb-2 border-gray-300">
                   <div className="flex justify-between items-center px-4">
                     <p className="text-xl">Editor</p>
-                    <button className="bg-slate-800 text-white px-4 py-2 rounded-md">Visualize</button>
+                    <Link  href="/newvisualise" className="bg-slate-800 text-white px-4 py-2 rounded-md">Visualize</Link>
                   </div>
                 </div>
                 <Editor

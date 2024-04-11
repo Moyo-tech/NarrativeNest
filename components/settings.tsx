@@ -21,14 +21,6 @@ export default function Settings({setIsOpen, setting, setSetting}) {
         })
 
         if (!response.ok) {
-            // try {
-            //   const data = await response.json();
-            //   Object.assign(error, {
-            //     code: data.code,
-            //     messageLines: [data.message],
-            //   });
-            // } catch (e) {}
-            // setModelError(error);
             setError("Invalid API Key")
             setModels(null)
             return;
