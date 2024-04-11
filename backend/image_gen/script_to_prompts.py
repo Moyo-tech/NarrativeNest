@@ -3,8 +3,7 @@ from dotenv import load_dotenv
 import os
 from groq import Groq
 
-# Make sure your .env file is correctly formatted and located
-load_dotenv()
+# load_dotenv()
 
 # api_key = os.getenv('OPENAI_API_KEY')
 # if not api_key:
@@ -71,7 +70,6 @@ client = Groq(
     api_key=os.getenv("API_KEY"),
 )
 
-import groq
 
 def generate_prompts_from_script(script):
     # Format the script into the Groq messages structure
@@ -79,28 +77,24 @@ def generate_prompts_from_script(script):
         {
             "role": "assistant",
             "content": (
-                """You are an expert at converting movie scripts into concise image generation prompts for stable diffusion models, 
-                your focus is on producing images generation prompts of images that closely resemble cinematic film stills. 
-                Each generated image should capture the essence of a film scene, featuring a 16:9 aspect ratio and maintaining cultural authenticity, 
-                especially highlighting Nigerian cultural elements if necessary.
+            """
+            You're tasked with transforming movie scripts into detailed prompts for stable diffusion models, aimed at creating image generations that mirror cinematic film stills. Your specialty lies in crafting prompts that produce images embodying the essence of film scenes, adhering to a 16:9 aspect ratio and ensuring cultural accuracy, with a focus on Nigerian cultural elements when appropriate.
 
-            For each relevant scene, event, or dialogue in the script given to you, generate a maximum of 6 detailed image prompts. generate a maximum of 6 detailed image prompts. Start each scene prompt with "Scene" followed by a number and a colon (e.g., "Scene 1:"). Each prompt MUST begin with the "Generate a" keyword VERY IMPORTANT. Ensure the prompts are well-developed, focusing on the following key aspects:
+            For each significant scene, event, or piece of dialogue from the script, create up to six comprehensive image prompts. Begin each scene prompt with "Scene" followed by a sequential number and a colon (e.g., "Scene 1:"). It's crucial that each prompt starts with the keyword "Generate a" to guide the image generation process effectively. Your prompts should meticulously address the following aspects:
 
-            1. Characters and Subjects: Identify the main characters or subjects in the scene.
-            2. Setting and Background: Describe the scene's setting and background.
-            3. Type of Camera Shot: Recommend a specific type of camera shot (e.g., close-up, wide-angle) to best capture the scene.
-            4. Lighting and Mood: Suggest lighting and mood (e.g., soft, dramatic) to enhance the scene's visual impact.
-            5. Technical Details: Include camera, lens, and other technical details to achieve a film still look.
-            8. Cultural Elements: Highlight any important cultural elements or aesthetics specific to the scene.
-            The generated prompts should collectively offer a coherent and visually engaging representation of the script, emphasizing cinematic film still style within a 16:9 aspect ratio. Please ensure that the prompts are consistent with each other and directly relevant to the events and dialogues provided in the script.
-            The generated prompts should collectively offer a coherent and visually engaging representation of the script, emphasizing cinematic film still style within a 16:9 aspect ratio. Please ensure that the prompts are consistent with each other and directly relevant to the events and dialogues provided in the script.
+            Characters and Subjects: Clearly identify the main characters or subjects within the scene.
+            Setting and Background: Elaborate on the scene's setting and background details.
+            Camera Shot Type: Suggest a specific camera shot (e.g., close-up, wide-angle) to ideally capture the scene.
+            Lighting and Mood: Describe the desired lighting and mood (e.g., soft, dramatic) to enhance the visual appeal of the scene.
+            Technical Details: Include specific camera, lens, and other technical specifications for achieving a cinematic still appearance.
+            Cultural Elements: Emphasize any significant cultural elements or aesthetics pertinent to the scene.
+            The prompts you generate should together form a coherent and visually compelling narrative of the script, with a focus on mimicking the style of cinematic film stills in a 16:9 aspect ratio. Ensure consistency among the prompts and their relevance to the script's events and dialogues.
 
-In addition to the generated prompts output you would generate shot descriptions, shot type and set design of the image. their own output should be like this : 
-start with this"(-)"Description: A short description of what is happening in the scene.
-            start with this"(-)"Shot Type: The recommended shot type/angle.
-            start with this"(-)"Set Design : Suggested set design elements.
-            
-            You EXCEL at following instructions, you are exceptional at following instructions, YOU MUST FOLLOW THE INSTRUCTIONS GIVEN ACCORDINGLY
+            Alongside the image prompts, you're also expected to produce detailed shot descriptions, including shot type and set design, formatted as follows:
+            Description: Offer a concise narrative of the scene's action.
+            Shot Type: Specify the recommended shot type or angle.
+            Set Design: Suggest relevant set design elements.
+            Your ability to adhere to instructions meticulously is paramount. You are highly skilled at following guidelines, and it is essential that you execute the given instructions accurately.
             """
             )
         },
@@ -134,4 +128,41 @@ start with this"(-)"Description: A short description of what is happening in the
         # Handle any errors that occur during the API call
         print(f"An error occurred: {e}")
         return {"success": False, "message": f"Error generating prompts: {str(e)}"}
+
+
+
+# def generate_prompts_from_script(script):
+#     prompt = (
+#         """
+#         You're tasked with transforming movie scripts into detailed prompts for dall-e-3 image generation model, aimed at creating image generations that mirror cinematic film stills. Your specialty lies in crafting prompts that produce images embodying the essence of film scenes, adhering to a 16:9 aspect ratio and ensuring cultural accuracy, with a focus on Nigerian cultural elements when appropriate.
+
+#         Create up to six detailed and descriptive dall-e-3 image prompts for each significant scene, event, or piece of dialogue from the script. Begin each scene prompt with "Scene" followed by a sequential number and a colon (e.g., "Scene 1:"). It's crucial that each prompt starts with the keyword "Generate a" to guide the image generation process effectively. Specify the style of cinematic film in 16:9 aspect ratio in the prompts.
+#         The prompts you generate should form a coherent and visually compelling script narrative. Ensure consistency among the prompts and their relevance to the script's events and dialogues. Describe the settings of the scenes, the main subjects, their activities and expressions and the time of day 
+#             Alongside the image prompts, you're also expected to produce detailed shot descriptions, including shot type and set design, formatted as follows:
+#             Description: Offer a concise narrative of the scene's action.
+#             Shot Type: Specify the recommended  film shot type .
+#             Set Design: Suggest relevant set design elements.
+#             Your ability to adhere to instructions meticulously is paramount. You are highly skilled at following guidelines, and it is essential that you execute the given instructions accurately.
+#         SCRIPT: {}
+#         """.format(script)
+#     )
+
+#     try:
+#         response = client.chat.completions.create(
+#           model="gpt-4",
+#           prompt=prompt,
+#           temperature=0.7,
+#           max_tokens=1024,
+#           top_p=1.0,
+#           frequency_penalty=0.0,
+#           presence_penalty=0.0
+#         )
+
+#         generated_prompts = response.choices[0].text.strip()
+
+#         return {"success": True, "prompts": generated_prompts}
+
+#     except Exception as e:
+#         print(f"An error occurred: {e}")
+#         return {"success": False, "message": f"Error generating prompts: {str(e)}"}
 

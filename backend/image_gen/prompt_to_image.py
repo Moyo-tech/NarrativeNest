@@ -19,3 +19,32 @@ def generate_images_from_prompts(prompts):
         # Assuming the output contains a direct link to the generated image
         images.append(output[0])
     return images
+
+
+# from openai import OpenAI
+# from dotenv import load_dotenv
+# import os
+# from groq import Groq
+
+# load_dotenv()
+
+# api_key = os.getenv('OPENAI_API_KEY')
+# if not api_key:
+#     raise ValueError("OPENAI_API_KEY not found in environment variables.")
+
+# client = OpenAI(api_key=api_key)  # This
+
+
+# def generate_images_from_prompts(prompts):
+#     images = []
+#     for prompt in prompts:
+#         response = client.images.generate(
+#         model="dall-e-3",
+#         prompt=prompt,
+#         size="1024x1024",
+#         quality="standard",
+#         n=1,
+#         )
+#         image_url = response.data[0].url
+#         images.append(image_url)
+#     return images

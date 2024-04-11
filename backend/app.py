@@ -168,10 +168,6 @@ class NarrativeNest :
             app.logger.error(f"Failed to generate scene details from script: {e}")
             return jsonify({"error": "Failed to generate scene details from script"}), 500
         
-        
-        # Extract scene details from the script
-        
-
         # Generate images from the prompts
         try:
             images = generate_images_from_prompts(image_prompts)
@@ -182,7 +178,6 @@ class NarrativeNest :
             app.logger.error(f"Failed to generate images from prompts: {e}")
             return jsonify({"error": "Failed to generate images from prompts"}), 500
 
-        # images = ['https://replicate.delivery/pbxt/U8GXyFNCJCIjON8NVB4zkNSwafVXwe1f3AXyTIWOWCQNigPlA/out-0.png', 'https://replicate.delivery/pbxt/aff77RmDwfd9nIduZ4gya4fYEwEBvPAISPyN4MpVybEgEBfUC/out-0.png', 'https://replicate.delivery/pbxt/AjL8GMgw8srlGtDveR5UNLgPbyoTUc35QXnZNZvCJveMRwnSA/out-0.png', 'https://replicate.delivery/pbxt/tO2G0L8Yc2IHAheGbKLo4e3DnAf3vos2T7BgXC4ZSZLeEBfUC/out-0.png', 'https://replicate.delivery/pbxt/CP13HYhTAU58PRQOZdZeHTMcLmVYuWEguW54eFJaZymSRwnSA/out-0.png', 'https://replicate.delivery/pbxt/c6xG0IcJFO6UFRD1DGed6N20ieffvw1QeyDaaeOPgkSIVE8pE/out-0.png']
           # Combine scene details with corresponding image URLs
         scenes_response = []
         for details, img_url in zip(scene_details, images):
