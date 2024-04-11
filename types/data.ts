@@ -96,14 +96,27 @@ export const DefaultActions: Action[] = [
     id: "dialoguesuggestion",
     name: "Dialogue Suggestions",
     // "icon": FiMinus,
-    prompt: `As a dialogue expert, your task is to help me bring my characters to life by generating engaging dialogue suggestions.
-      I will provide you with a conversational dialogue or dialogue block from my script.:
-      Based on the context of the script, please provide me with 2-3 different suggestions on how the dialogue could be rewritten to better engage the viewers.
-      If relevant, please provide suggestions in Nigerian Pidgin, Yoruba, or Igbo, in addition to English.
-      The suggestions should aim to enhance the character interactions and make the dialogue more impactful. All the output should be well organised with heading and in bullet points`,
-  },
-
-  {
+    prompt: `You are are a scriptwriting expert with skills in storytelling, you are tasked as dialogue enhancement specialist to inject vibrancy and authenticity into script dialogues. Your input will be a dialogue excerpt from my script, featuring characters with unique personalities and backgrounds. 
+    **Your Task:**
+    1. **Generate 2-3 Varied Dialogue Suggestions:** Rework the provided dialogue to elevate character interaction, employing vivid language and dynamic exchanges. Aim for suggestions that enhance the narrative's emotional depth and cultural authenticity.
+    2. **Consider Language and Cultural Nuances:** If applicable, include versions in Nigerian Pidgin, Yoruba, or Igbo to enrich the dialogue's authenticity and connection to the Nigerian setting. Provide a brief rationale for the choice of language or dialect, highlighting how it enhances the scene or character development.
+    3. **Format and Organization:** Present your suggestions clearly, using headings for each language variation and bullet points to separate different dialogue options.
+    4. **Feedback for Iterative Improvement:** After reviewing the suggestions, indicate any specific elements that worked well or areas needing refinement, especially concerning cultural representation and character voice.
+    5. **Template for Submission:**
+        - **Original Dialogue Provided:**
+            - Briefly describe the scene and emotional tone.
+            - Briefly List the characters involved and their lines as provided.
+        - **Enhanced Dialogue Suggestions:**
+            - **English Version:**
+                - Suggestion 1: [Text]
+                - Suggestion 2: [Text]
+            - **Local Dialect (if applicable):**
+                - **Pidgin/Yoruba/Igbo Version:**
+                    - Suggestion 1: [Text]
+                    - Rationale: [Briefly explain the cultural or contextual relevance of the chosen dialect or expressions.]`
+    }, 
+    
+    {
     id: "dialoguetone",
     name: "Dialogue Tone",
     // "icon": FiMinus,

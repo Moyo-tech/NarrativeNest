@@ -10,16 +10,18 @@ const GenerateTitle: React.FC = () => {
   const updateGeneratedTitle = useUpdateGeneratedTitle();
   const [generatedResult, setGeneratedResult] = useState<string>("");
   const [seed, setSeed] = useState<number>(1); // Initial seed with type
-
+  const [loading, setLoading] = useState(false);
   const handleTitleGeneration = async () => {
     try {
+      setLoading(true); // Start loading
       const response = await axios.post<{ title: string }>(
-        "http://localhost:5000/api/generate-title", { seed }
+        "http://localhost:5000/api/generate-title",
+        { seed }
       );
       const { title } = response.data;
       setGeneratedResult(title);
-      setSeed(prevSeed => prevSeed + 1); // Use functional update for state based on previous state
-
+      setSeed((prevSeed) => prevSeed + 1); // Use functional update for state based on previous state
+      setLoading(false); // End loading
     } catch (error) {
       console.error("Error:", error);
     }
@@ -28,12 +30,11 @@ const GenerateTitle: React.FC = () => {
   const handleRewriteTitle = async () => {
     try {
       const response = await axios.post<{ rewrite_title: string }>(
-        "http://localhost:5000/api/rewrite-title", 
+        "http://localhost:5000/api/rewrite-title",
         { title: generatedResult }
       );
       const { rewrite_title } = response.data;
       setGeneratedResult(rewrite_title);
-
     } catch (error) {
       console.error("Error:", error);
     }
@@ -44,12 +45,9 @@ const GenerateTitle: React.FC = () => {
       <Storycard
         title={"Title"}
         generatedResult={generatedResult}
-        onGenerateNew={handleRewriteTitle}
         onRun={handleTitleGeneration}
-        // Provide dummy functions for missing required props
-        onPrevious={() => {}}
-        onNext={() => {}}
-        onContinue={() => {}}
+        loading={loading}
+        loadingtext="generating title..."    
       />
     </>
   );

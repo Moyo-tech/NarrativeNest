@@ -1,21 +1,12 @@
 import {
   ChatHistory,
   Message,
-  TasksMap,
-  TaskType,
-  Tasks,
-  Setting,
   ActionIconMap,
 } from "@/types/data";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 
 import {
   $getRoot,
-  $getSelection,
-  SELECTION_CHANGE_COMMAND,
-  $isRangeSelection,
-  $setSelection,
-  $createRangeSelection,
   $createParagraphNode,
   $createTextNode,
 } from "lexical";
@@ -52,21 +43,6 @@ function ChatMessage({ msg, addText }) {
     </div>
   );
 }
-
-// {
-// if(msg.role == 'user'){
-//   return <div key={j} className="p-2 my-2 rounded flex">
-//     <div className="mr-2">
-//       <HiUser size="1.2rem" className=" text-gray-400"/>
-//     </div><ReactMarkdown className="markdown">{msg.content}</ReactMarkdown></div>
-// }else{
-//   return <div key={j} className="p-2 my-2 rounded flex hover:bg-gray-200 cursor-pointer" onClick={()=>addText(msg.content)}>
-//     <div className="mr-2">
-//       <HiSparkles size="1.2rem" className=" text-gray-400"/>
-//     </div>
-//     <ReactMarkdown className="markdown">{msg.content}</ReactMarkdown>
-//     </div>
-// }
 
 function Conversation({ item, index, onChatUpdate, addText, setting }) {
   const [loading, setLoading] = useState(false);
@@ -273,88 +249,7 @@ function Conversation({ item, index, onChatUpdate, addText, setting }) {
 export default function CopilotPlugin({ setting, history, onChatUpdate }) {
   const [editor] = useLexicalComposerContext();
   console.log("CopilotPlugin", history);
-  /*function update() {
-        editor.update(() => {
-          const root = $getRoot();
-          // const p = $createParagraphNode();
-          // p.append($createTextNode("new node"));
-          // root.append(p);
-    
-          const selection = $getSelection();
-          if (!$isRangeSelection(selection)) return;
-          if (selection) {
-            console.log(selection.getTextContent());
-          //   const txt = "SAMPLE";
-            const txt = await copilot("expand", selection.getTextContent())
-            selection.insertText(txt);
-            // selection.getNodes()[0].setTextContent("HELLO")
-            console.log(selection.getNodes());
-            console.log("START", selection.anchor.key, selection.anchor.offset);
-            console.log("END", selection.focus.key, selection.focus.offset);
-            const rangeSelection = $createRangeSelection();
-            const startKey = selection.anchor;
-            const endKey = selection.focus;
-            rangeSelection.focus.set(
-              startKey.key,
-              startKey.offset - txt.length,
-              "text"
-            );
-            rangeSelection.anchor.set(endKey.key, endKey.offset, "text");
-            $setSelection(rangeSelection);
-          }
-        });
-      }*/
-
-  // async function copilot(task, selection){
-  //     const response = await fetch(`/api/writer`, {
-  //         headers: {
-  //         'Content-Type': 'application/json',
-  //         },
-  //         method: 'POST',
-  //         body: JSON.stringify({task, selection, before:"", after:""}),
-  //     });
-  //     console.log(response.body)
-  //     const data = await response.json();
-  //     console.log("INPUT:", selection)
-  //     console.log("OUTPUT:", data.message.content)
-  //     return data.message.content;
-  // };
-
-  //https://stackoverflow.com/questions/75177766/is-there-a-way-to-make-an-async-request-inside-a-lexical-editor-update-in-react
-  // async function update(task: TaskType) {
-  //     const textContent = editor.getEditorState().read(() => $getSelection()?.getTextContent());
-  //     if(textContent === ""){
-  //         return;
-  //     }
-  //     const txt = await copilot(task, textContent)
-  //   editor.update(() => {
-  //     const selection = $getSelection()
-  //     if (!$isRangeSelection(selection)) return;
-  //     if(selection){
-  //       selection.insertText(txt);
-  //       console.log(selection.getNodes());
-  //       console.log("START", selection.anchor.key, selection.anchor.offset);
-  //       console.log("END", selection.focus.key, selection.focus.offset);
-  //       const rangeSelection = $createRangeSelection();
-  //       const startKey = selection.anchor;
-  //       const endKey = selection.focus;
-  //       rangeSelection.focus.set(
-  //         startKey.key,
-  //         startKey.offset - txt.length,
-  //         "text"
-  //       );
-  //       rangeSelection.anchor.set(endKey.key, endKey.offset, "text");
-  //       $setSelection(rangeSelection);
-  //     }
-  //   });
-  // }
-
-  // SELECTION_CHANGE_COMMAND fires when selection changes within a Lexical editor.
-  // editor.registerCommand(SELECTION_CHANGE_COMMAND, () => {
-  //   const selection = $getSelection();
-  // });
-
-  // return <button onClick={update}>Add a node</button>;
+ 
 
   const addText = (text: string) => {
     editor.update(() => {
@@ -369,12 +264,6 @@ export default function CopilotPlugin({ setting, history, onChatUpdate }) {
     });
   };
 
-  // const _handleKeyDown = (e) => {
-  //   if (e.key === 'Enter') {
-  //     console.log('do validate');
-
-  //   }
-  // }
 
   return (
     <>

@@ -5,8 +5,9 @@ import Storycard from './Storycard'; // Ensure this path matches where your Stor
 // Define the component using TypeScript's Function Component type (React.FC)
 const RenderStory: React.FC = () => {
   const [generatedResult, setGeneratedResult] = useState<string>("");
-
+  const [loading, setLoading] = useState(false);
   const handleRenderStory = async () => {
+    setLoading(true); // Start loading
     try {
       // Define the expected shape of your response data using a TypeScript interface
       interface ApiResponse {
@@ -17,6 +18,7 @@ const RenderStory: React.FC = () => {
       const { script } = response.data;
       console.log('the script does generate');
       setGeneratedResult(script); // Update state with the API response
+      setLoading(false); // End loading
     } catch (error) {
       console.error("Error:", error);
     }
@@ -27,11 +29,8 @@ const RenderStory: React.FC = () => {
       title={'Scripts'}  
       generatedResult={generatedResult} 
       onRun={handleRenderStory}
-      // Provide implementations or placeholders for any required props not used in this component
-      onGenerateNew={() => {}}
-      onPrevious={() => {}}
-      onNext={() => {}}
-      onContinue={() => {}}
+      loadingtext='generating scripts...'
+      loading={loading}
     />
   );
 };

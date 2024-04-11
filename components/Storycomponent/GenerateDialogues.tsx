@@ -29,13 +29,15 @@ const GenerateDialogues = () => {
   const [generatedDialogue, setGeneratedDialogue] = useState<string>("");
   const [maxScenes, setMaxScenes] = useState<number>(1);
   const [val, setVal] = useState<number>(MIN);
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (_: any, newValue: number) => {
     setVal(newValue);
   };
 
   const handleDialogueGeneration = async () => {
-    try {
+    try {      setLoading(true); // Start loading
+
       const response = await axios.post<{
         dialogue: string;
         numScenes: number;
@@ -44,6 +46,8 @@ const GenerateDialogues = () => {
 
       setMaxScenes(numScenes);
       setGeneratedDialogue(dialogue); // Update state with the API response
+      setLoading(false); // End loading
+
     } catch (error) {
       console.error("Error:", error);
     }
@@ -106,11 +110,28 @@ const GenerateDialogues = () => {
 </button>
       </div>
 
-      <textarea
-      rows="4"
-      className="w-full p-2 border-2 rounded-xl  focus:border-gray-400 hover:border-gray-400 bg-white"
-      value={generatedDialogue}
-      ></textarea>
+      {loading ? (
+          <div className="flex flex-col		 justify-center items-center h-32">
+            <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-purple-500"></div>
+            <p
+              style={{
+                background: "linear-gradient(45deg, #6EE7B7, #3B82F6)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                display: "inline",
+              }}
+            >
+              generating dialogues...
+            </p>
+          </div>
+        ) : (
+          <textarea
+            rows="4"
+            className="w-full p-2 border-2 rounded-xl focus:border-gray-400 hover:border-gray-400 bg-white"
+            value={generatedDialogue}
+            readOnly
+          ></textarea>
+        )}
 
       <div
         style={{

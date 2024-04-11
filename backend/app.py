@@ -191,9 +191,7 @@ class NarrativeNest :
             scenes_response.append(scene)
 
         return jsonify(scenes_response)
-        # Combine prompts and images in the response
-        # storyboard = [{"prompt": prompt, "image": image} for prompt, image in zip(scenes, images)]
-        # return jsonify(storyboard)
+  
 
 
     @cross_origin()

@@ -16,6 +16,7 @@ const SiderbarLeft: React.FC = () => {
   const [genrePrefix, setGenrePrefix] = useState<string>("");
   const [generatedTitle, setGeneratedTitle] = useState<string>("");
   const updateGeneratedTitle = useUpdateGeneratedTitle();
+  const [generationSuccess, setGenerationSuccess] = useState<boolean>(false); // New state
 
   const handleLoglineChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setLogline(event.target.value);
@@ -27,6 +28,7 @@ const SiderbarLeft: React.FC = () => {
 
   const handleStoryGeneration = async () => {
     try {
+      setGenerationSuccess(false); // Reset success state
       const response = await axios.post(
         "http://localhost:5000/api/generate-story",
         {
@@ -35,7 +37,8 @@ const SiderbarLeft: React.FC = () => {
         }
       );
       console.log("story generator is setupp");
-      // Update the UI with the generated story
+      setGenerationSuccess(true); // Reset success state
+
     } catch (error) {
       console.error("Error:", error);
     }
@@ -83,6 +86,20 @@ const SiderbarLeft: React.FC = () => {
       >
         Write
       </button>
+      {generationSuccess && (
+            <p
+              style={{
+                background: "linear-gradient(45deg, #6EE7B7, #3B82F6)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                display: "inline",
+
+                textAlign: "center",
+              }}
+            >
+Story Generator Created            </p>
+        )}
+
     </div>
   );
 };
