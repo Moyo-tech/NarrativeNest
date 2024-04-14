@@ -21,6 +21,7 @@ export default function Settings({setIsOpen, setting, setSetting}) {
         })
 
         if (!response.ok) {
+
             setError("Invalid API Key")
             setModels(null)
             return;

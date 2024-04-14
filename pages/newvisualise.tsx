@@ -24,6 +24,7 @@ import {
   BsFillLightningChargeFill,
 } from "react-icons/bs";
 import { useEffect } from "react";
+import Image from "next/image";
 
 interface StoryboardElement {
   Description: string;
@@ -38,13 +39,14 @@ const newvisual = () => {
   const [loading, setLoading] = useState(false); // New state to track loading
 
   useEffect(() => {
-    const loadedStoryboards = localStorage.getItem("storyboards");
-    console.log("Loaded storyboards from local storage:", loadedStoryboards); // Debug log
-    if (loadedStoryboards) {
-      setStoryboards(JSON.parse(loadedStoryboards));
+    // Ensure this runs only on client-side
+    if (typeof window !== "undefined") {
+      const loadedStoryboards = localStorage.getItem("storyboards");
+      if (loadedStoryboards) {
+        setStoryboards(JSON.parse(loadedStoryboards));
+      }
     }
   }, []);
-
   // Save storyboards to local storage whenever they change
   useEffect(() => {
     console.log("Saving storyboards to local storage:", storyboards); // Debug log
@@ -215,12 +217,14 @@ const newvisual = () => {
             <div className="border-b pb-2 mb-2 border-gray-300">
               <div className="flex justify-between items-center px-4">
                 <p className="text-xl">Storyboard</p>
-                <Link href= "/editor" className="bg-slate-800 text-white px-4 py-2 rounded-md">
-Editor                </Link>
+                <Link
+                  href="/editor"
+                  className="bg-slate-800 text-white px-4 py-2 rounded-md"
+                >
+                  Editor{" "}
+                </Link>
               </div>
             </div>
-
-       
 
             {loading ? (
               renderSkeleton()
@@ -228,37 +232,45 @@ Editor                </Link>
               <div className="grid grid-cols-3 gap-4 p-4">
                 {storyboards.map((storyboards, index) => (
                   <>
-                  <div className="relative flex flex-col mt-6 text-gray-700 bg-white shadow-md bg-clip-border rounded-xl w-80">
-                    <div className="relative mx-4 -mt-6 overflow-hidden text-white shadow-lg bg-clip-border rounded-xl bg-blue-gray-500 shadow-blue-gray-500/40">
-                    <img src={storyboards["Image URL"]} alt="card-image" />
-                    </div>
+                    <div className="relative flex flex-col mt-6 text-gray-700 bg-white shadow-md bg-clip-border rounded-xl w-80">
+                      <div className="relative mx-4 -mt-6 overflow-hidden text-white shadow-lg bg-clip-border rounded-xl bg-blue-gray-500 shadow-blue-gray-500/40">
+                        <img
+                          src={storyboards["Image URL"]}
+                          loading="lazy"
+                          alt="card-image"
+                          // layout="responsive"
+                          // width={500}
+                          // height={500}
+                          // quality={75} // Value between 1 and 100
+                        />
+                      </div>
 
-                    <div className="p-6  mt-3 mb-6">
-                      <div className="flex items-center pb-4">
-                        <BsCameraReelsFill className="text-xl mr-2" />
-                        <p className="block font-sans text-base antialiased font-light leading-relaxed text-inherit">
-                          {storyboards.Description}
-                        </p>
-                      </div>
-                      <div className="border-t border-white/2"></div>
-                      <div className="flex items-center pb-4 pt-4">
-                        <BsFillEaselFill className="text-xl mr-2" />
-                        <p className="block font-sans text-base antialiased font-light leading-relaxed text-inherit">
-                        {storyboards["Shot Type"]}
-                        </p>
-                      </div>
-                      <div className="border-t border-white/2"></div>
-                      <div className="flex items-center pb-4 pt-4">
-                        <BsFillLightningChargeFill className="text-xl mr-2" />
-                        <p className="block font-sans text-base antialiased font-light leading-relaxed text-inherit">
+                      <div className="p-6  mt-3 mb-6">
+                        <div className="flex items-center pb-4">
+                          <BsCameraReelsFill className="text-xl mr-2" />
+                          <p className="block font-sans text-base antialiased font-light leading-relaxed text-inherit">
+                            {storyboards.Description}
+                          </p>
+                        </div>
+                        <div className="border-t border-white/2"></div>
+                        <div className="flex items-center pb-4 pt-4">
+                          <BsFillEaselFill className="text-xl mr-2" />
+                          <p className="block font-sans text-base antialiased font-light leading-relaxed text-inherit">
+                            {storyboards["Shot Type"]}
+                          </p>
+                        </div>
+                        <div className="border-t border-white/2"></div>
+                        <div className="flex items-center pb-4 pt-4">
+                          <BsFillLightningChargeFill className="text-xl mr-2" />
+                          <p className="block font-sans text-base antialiased font-light leading-relaxed text-inherit">
                             {storyboards["Set Design"]}
-                        </p>
+                          </p>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </>
-              ))}
-            </div> 
+                  </>
+                ))}
+              </div>
             )}
           </div>
         </div>

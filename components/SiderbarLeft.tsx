@@ -74,9 +74,9 @@ const SiderbarLeft: React.FC = () => {
           label="Age"
           style={{ borderRadius: "10px", fontSize: 14 }}
         >
-          <MenuItem value="medea_prefixes">Medea Prefix</MenuItem>
-          <MenuItem value="scifi_prefixes">Sci-fi Prefix</MenuItem>
-          <MenuItem value="custom_prefixes">Custom Prefix</MenuItem>
+          <MenuItem value="medea_prefixes">Drama Prefix</MenuItem>
+          <MenuItem value="scifi_prefixes">Comedy Prefix</MenuItem>
+          <MenuItem value="custom_prefixes">Folktales Prefix</MenuItem>
         </Select>
       </FormControl>
 

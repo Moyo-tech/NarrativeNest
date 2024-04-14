@@ -141,18 +141,18 @@ class NarrativeNest :
     def generate_storyboard(self):
         script = request.json.get('script')
         # Generate prompts from the script
-        # try:
-        #     prompts = generate_prompts_from_script(script)
-        #     app.logger.info("Successfully generated prompts from script.\n\n")
-        #     app.logger.info(f"Prompts: {prompts} \n\n")  # Corrected line to log prompts
+        try:
+            prompts = generate_prompts_from_script(script)
+            app.logger.info("Successfully generated prompts from script.\n\n")
+            app.logger.info(f"Prompts: {prompts} \n\n")  # Corrected line to log prompts
 
-        # except Exception as e:
-        #     app.logger.error(f"Failed to generate prompts from script: {e}")
-        #     return jsonify({"error": "Failed to generate prompts from script"}), 500
+        except Exception as e:
+            app.logger.error(f"Failed to generate prompts from script: {e}")
+            return jsonify({"error": "Failed to generate prompts from script"}), 500
         
-        prompts: Dict[str, Union[str, bool]] = {
-            'success': True, 'prompts': "Scene 1: Generate a 16:9 cinematic image of a bustling Nigerian market during the day. Vendors are seen setting up their colorful stalls. The air is filled with the aroma of different spices and the sounds of chatter. The market is vibrant and filled with a variety of people engaged in various activities, setting the stage for a lively atmosphere.\n\nDescription: This scene captures the dynamic energy and rich cultural hues of a Nigerian market. \nShot Type: Establishing shot to portray the overall setting.\nSet Design: Colorful market stalls, people in traditional Nigerian attire, diverse merchandise, and street food. \n\nScene 2: Generate a 16:9 cinematic image of Adaeze, a determined young woman, arranging her dishes in her food-stall. Next to her stands Chike, her friend, admiring her dishes while revealing his latest piece of artwork - a canvas displaying vibrant colors and intricate designs.\n\nDescription: In this intimate scene, Adaeze and Chike are seen sharing their passions.\nShot Type: Over-the-shoulder shot to showcase the interaction and the artwork.\nSet Design: Inside of a Nigerian food-stall filled with various traditional dishes, and Chike holding a colorful painting. \n\nScene 3: Generate a 16:9 cinematic image of Mama Ngozi—an elderly woman with a lively expression—surrounded by a captive audience in the market as she weaves another one of her engaging tales, pointing animatedly into the air.\n\nDescription: This scene captures the entrancing storytelling tradition.\nShot Type: Medium shot, capturing Mama Ngozi and her absorbed audience.\nSet Design: An open-air market setting with people gathered around Mama Ngozi, hanging onto her every word. \n\nScene 4: Generate a 16:9 cinematic image of Adaeze and Chike reacting with distress as mischievous children accidentally knock over the food stall, causing the food to spill out onto the street.\n\nDescription: The scene showcases a sudden mishap stirring chaos at the food stall.\nShot Type: Close-up shot to focus on Adaeze's and Chike's reactions.\nSet Design: Adaeze's food stall, with a mess of spilled food and overturned tables and chairs.\n\nScene 5: Generate a 16:9 cinematic image of Mama Ngozi, comforting Adaeze and Chike amidst the chaos, lighting their faces with her wisdom and kind smile as she delivers her words of encouragement.\n\nDescription: This scene highlights Mama Ngozi's comforting presence post mishap.\nShot Type: Medium shot capturing the trio and the chaotic background.\nSet Design: The same disturbed food stall setting with Mama Ngozi acting as a calming presence. \n\nScene 6: Generate a 16:9 cinematic image of Adaeze and Chike sitting together in the quieter evening market, surrounded by their friends and fellow vendors. They share a hearty meal, smiles on their faces, a warm orange sunset illuminating the scene.\n\nDescription: A hopeful ending depicting camaraderie amidst the trial they endured.\nShot Type: Wide shot capturing the warmth of the community.\nSet Design: A lively Nigerian market at sunset, filled with people eating, laughing, and enjoying their time."
-        }
+        # prompts: Dict[str, Union[str, bool]] = {
+        #     'success': True, 'prompts': "Scene 1: Generate a 16:9 cinematic image of a bustling Nigerian market during the day. Vendors are seen setting up their colorful stalls. The air is filled with the aroma of different spices and the sounds of chatter. The market is vibrant and filled with a variety of people engaged in various activities, setting the stage for a lively atmosphere.\n\nDescription: This scene captures the dynamic energy and rich cultural hues of a Nigerian market. \nShot Type: Establishing shot to portray the overall setting.\nSet Design: Colorful market stalls, people in traditional Nigerian attire, diverse merchandise, and street food. \n\nScene 2: Generate a 16:9 cinematic image of Adaeze, a determined young woman, arranging her dishes in her food-stall. Next to her stands Chike, her friend, admiring her dishes while revealing his latest piece of artwork - a canvas displaying vibrant colors and intricate designs.\n\nDescription: In this intimate scene, Adaeze and Chike are seen sharing their passions.\nShot Type: Over-the-shoulder shot to showcase the interaction and the artwork.\nSet Design: Inside of a Nigerian food-stall filled with various traditional dishes, and Chike holding a colorful painting. \n\nScene 3: Generate a 16:9 cinematic image of Mama Ngozi—an elderly woman with a lively expression—surrounded by a captive audience in the market as she weaves another one of her engaging tales, pointing animatedly into the air.\n\nDescription: This scene captures the entrancing storytelling tradition.\nShot Type: Medium shot, capturing Mama Ngozi and her absorbed audience.\nSet Design: An open-air market setting with people gathered around Mama Ngozi, hanging onto her every word. \n\nScene 4: Generate a 16:9 cinematic image of Adaeze and Chike reacting with distress as mischievous children accidentally knock over the food stall, causing the food to spill out onto the street.\n\nDescription: The scene showcases a sudden mishap stirring chaos at the food stall.\nShot Type: Close-up shot to focus on Adaeze's and Chike's reactions.\nSet Design: Adaeze's food stall, with a mess of spilled food and overturned tables and chairs.\n\nScene 5: Generate a 16:9 cinematic image of Mama Ngozi, comforting Adaeze and Chike amidst the chaos, lighting their faces with her wisdom and kind smile as she delivers her words of encouragement.\n\nDescription: This scene highlights Mama Ngozi's comforting presence post mishap.\nShot Type: Medium shot capturing the trio and the chaotic background.\nSet Design: The same disturbed food stall setting with Mama Ngozi acting as a calming presence. \n\nScene 6: Generate a 16:9 cinematic image of Adaeze and Chike sitting together in the quieter evening market, surrounded by their friends and fellow vendors. They share a hearty meal, smiles on their faces, a warm orange sunset illuminating the scene.\n\nDescription: A hopeful ending depicting camaraderie amidst the trial they endured.\nShot Type: Wide shot capturing the warmth of the community.\nSet Design: A lively Nigerian market at sunset, filled with people eating, laughing, and enjoying their time."
+        # }
         
         # Extract image prompts from the script
         try:
@@ -174,23 +174,23 @@ class NarrativeNest :
             return jsonify({"error": "Failed to generate scene details from script"}), 500
         
         # Generate images from the prompts
-        # try:
-        #     images = generate_images_from_prompts(image_prompts)
-        #     app.logger.info("Successfully generated images from prompts.")
-        #     app.logger.info(f"Images: {images}")  # Corrected line to log images
+        try:
+            images = generate_images_from_prompts(image_prompts)
+            app.logger.info("Successfully generated images from prompts.")
+            app.logger.info(f"Images: {images}")  # Corrected line to log images
 
-        # except Exception as e:
-        #     app.logger.error(f"Failed to generate images from prompts: {e}")
-        #     return jsonify({"error": "Failed to generate images from prompts"}), 500
+        except Exception as e:
+            app.logger.error(f"Failed to generate images from prompts: {e}")
+            return jsonify({"error": "Failed to generate images from prompts"}), 500
 
-        #   # Combine scene details with corresponding image URLs
-        # scenes_response = []
-        # for details, img_url in zip(scene_details, images):
-        #     scene = details # Copy details to avoid modifying the original
-        #     scene["Image URL"] = img_url
-        #     scenes_response.append(scene)
+          # Combine scene details with corresponding image URLs
+        scenes_response = []
+        for details, img_url in zip(scene_details, images):
+            scene = details # Copy details to avoid modifying the original
+            scene["Image URL"] = img_url
+            scenes_response.append(scene)
 
-        # return jsonify(scenes_response)
+        return jsonify(scenes_response)
   
 
 

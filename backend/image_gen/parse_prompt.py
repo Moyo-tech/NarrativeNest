@@ -9,10 +9,21 @@ def parse_prompts(generated_prompts):
     return scenes
 
 def extract_image_prompts(generated_prompts):
-    # Match only the sentences that start with "Generate a" following a scene header
-    pattern = r'Scene \d+:\n(Generate [^\n]+)'
-    prompts = re.findall(pattern, generated_prompts, re.MULTILINE)
-    return prompts
+      # First, split the prompts into scenes to process them individually
+    scenes = re.split(r'\nScene \d+:', generated_prompts)
+    image_prompts = []
+    
+    # Define the pattern to find "Generate a" sentences within each scene
+    generate_pattern = r'(Generate [^\n]+)'
+
+    # Iterate over each scene to find the "Generate a" sentences
+    for scene in scenes:
+        # Find all "Generate a" sentences within this scene
+        found_prompts = re.findall(generate_pattern, scene)
+        # Add found prompts to the list
+        image_prompts.extend(found_prompts)
+
+    return image_prompts
 
 def extract_scene_details(generated_prompts):
     scenes = re.split(r'Scene \d+:', generated_prompts)

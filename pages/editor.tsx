@@ -149,7 +149,7 @@ function Editor({
     <div className="w-full flex">
       <LexicalComposer initialConfig={editorConfig}>
         <PanelGroup direction="horizontal">
-          <Panel className="editor-inner w-full lg:w-3/5 p-4 ">
+          <Panel className="editor-inner w-full lg:w-3/5 p-4 h-screen !overflow-y-auto">
             <div className="editor-container  min-h-full">
               <ToolbarPlugin
                 setting={setting}
@@ -201,7 +201,7 @@ function Editor({
             className={
               isChatOpen
                 ? "p-4 bg-white  z-1 absolute w-full"
-                : "hidden lg:block ml-4 lg:w-2/5 "
+                : "hidden lg:block ml-4 lg:w-2/5 overflow-y-auto h-screen"
             }
             style={{ overflow: "auto" }}
           >
@@ -552,7 +552,7 @@ export default function App() {
 
                 <a
                   onClick={onCreateDoc}
-                  className="flex justify-between items-center text-xs p-3 items-center gap-3 transition-colors duration-200 cursor-pointer rounded-md border bg-gray-800 text-white hover:opacity-80 mb-1 flex-shrink-0"
+                  className="flex justify-between items-center text-xs p-3 gap-3 transition-colors duration-200 cursor-pointer rounded-md border bg-gray-800 text-white hover:opacity-80 mb-1 flex-shrink-0"
                 >
                   Create New
                   <AddIcon style={{ fontSize: 14 }} />

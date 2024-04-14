@@ -3,7 +3,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   SELECTION_CHANGE_COMMAND,
   FORMAT_TEXT_COMMAND,
-  FORMAT_ELEMENT_COMMAND,
+  FORMAT_ELEMENT_COMMAND, 
   $getSelection,
   $isRangeSelection,
   $createParagraphNode,
@@ -14,7 +14,7 @@ $createRangeSelection
 
 import { ActionIconMap } from "@/types/data";
 
-import { BsTypeBold, BsTypeItalic, BsTypeUnderline, BsTypeStrikethrough, BsTypeH1, BsTypeH2, BsListUl, BsListOl, BsCode, BsLink, BsQuote, BsTextParagraph, BsTextLeft,  BsTextRight, BsTextCenter, BsJustify} from 'react-icons/bs';
+import { BsTypeBold, BsTypeItalic, BsTypeUnderline, BsTypeStrikethrough, BsTypeH1, BsTypeH2, BsListUl, BsListOl, BsCode, BsLink, BsQuote, BsTextParagraph, BsTextLeft, BsTextRight, BsTextCenter,  } from 'react-icons/bs';
 
 import { $isLinkNode, TOGGLE_LINK_COMMAND } from "@lexical/link";
 import { $wrapNodes, $isAtNodeEnd } from "@lexical/selection";
@@ -54,7 +54,6 @@ const supportedBlockTypes = new Set([
   "code",
   "h1",
   "h2",
-  "h3",
   "ul",
   "ol"
 ]);
@@ -337,6 +336,50 @@ function BlockOptionsDropdownList({
     setShowBlockOptionsDropDown(false);
   };
 
+  const formatBulletList = () => {
+    if (blockType !== "ul") {
+      editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND);
+    } else {
+      editor.dispatchCommand(REMOVE_LIST_COMMAND);
+    }
+    setShowBlockOptionsDropDown(false);
+  };
+
+  const formatNumberedList = () => {
+    if (blockType !== "ol") {
+      editor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND);
+    } else {
+      editor.dispatchCommand(REMOVE_LIST_COMMAND);
+    }
+    setShowBlockOptionsDropDown(false);
+  };
+
+  const formatQuote = () => {
+    if (blockType !== "quote") {
+      editor.update(() => {
+        const selection = $getSelection();
+
+        if ($isRangeSelection(selection)) {
+          $wrapNodes(selection, () => $createQuoteNode());
+        }
+      });
+    }
+    setShowBlockOptionsDropDown(false);
+  };
+
+  const formatCode = () => {
+    if (blockType !== "code") {
+      editor.update(() => {
+        const selection = $getSelection();
+
+        if ($isRangeSelection(selection)) {
+          $wrapNodes(selection, () => $createCodeNode());
+        }
+      });
+    }
+    setShowBlockOptionsDropDown(false);
+  };
+
   return (
     <div className="dropdown" ref={dropDownRef}>
       <button className="item" onClick={formatParagraph}>
@@ -373,8 +416,10 @@ export default function ToolbarPlugin({setting, onCreateChat, setIsChatOpen, isM
   const [isLink, setIsLink] = useState(false);
   const [isBold, setIsBold] = useState(false);
   const [isItalic, setIsItalic] = useState(false);
+  const [isUnderline, setIsUnderline] = useState(false);
+  const [isStrikethrough, setIsStrikethrough] = useState(false);
+  const [isCode, setIsCode] = useState(false);
   const [isLeft, setIsLeft] = useState(false);
-
 
   const updateToolbar = useCallback(() => {
     const selection = $getSelection();
@@ -405,6 +450,9 @@ export default function ToolbarPlugin({setting, onCreateChat, setIsChatOpen, isM
       // Update text format
       setIsBold(selection.hasFormat("bold"));
       setIsItalic(selection.hasFormat("italic"));
+      setIsUnderline(selection.hasFormat("underline"));
+      setIsStrikethrough(selection.hasFormat("strikethrough"));
+      setIsCode(selection.hasFormat("code"));
 
       // Update links
       const node = getSelectedNode(selection);
@@ -435,6 +483,28 @@ export default function ToolbarPlugin({setting, onCreateChat, setIsChatOpen, isM
     );
   }, [editor, updateToolbar]);
 
+  const codeLanguges = useMemo(() => getCodeLanguages(), []);
+  const onCodeLanguageSelect = useCallback(
+    (e) => {
+      editor.update(() => {
+        if (selectedElementKey !== null) {
+          const node = $getNodeByKey(selectedElementKey);
+          if ($isCodeNode(node)) {
+            node.setLanguage(e.target.value);
+          }
+        }
+      });
+    },
+    [editor, selectedElementKey]
+  );
+
+  const insertLink = useCallback(() => {
+    if (!isLink) {
+      editor.dispatchCommand(TOGGLE_LINK_COMMAND, "https://");
+    } else {
+      editor.dispatchCommand(TOGGLE_LINK_COMMAND, null);
+    }
+  }, [editor, isLink]);
 
 
   
@@ -491,6 +561,10 @@ export default function ToolbarPlugin({setting, onCreateChat, setIsChatOpen, isM
       "paragraph": BsTextParagraph,
       "h1": BsTypeH1,
       "h2": BsTypeH2,
+      "ul": BsListUl,
+      "ol": BsListOl,
+      "quote": BsQuote,
+      "code": BsCode,
     }
     const Icon = mapping[icon];
     return (<Icon />);
@@ -561,6 +635,7 @@ export default function ToolbarPlugin({setting, onCreateChat, setIsChatOpen, isM
             {/* <i className="format italic" /> */}
             <i className="format"><BsTypeItalic/></i>
           </button>
+       
 
           <button
             onClick={() => {
@@ -592,9 +667,13 @@ export default function ToolbarPlugin({setting, onCreateChat, setIsChatOpen, isM
             {/* <i className="format code" /> */}
             <i className="format"><BsTextCenter/></i>
           </button>
-
-
-     
+          <button
+            onClick={insertLink}
+            className={"toolbar-item spaced " + (isLink ? "active" : "")}
+            aria-label="Insert Link"
+          >
+            <i className="format"><BsLink/></i>
+          </button>
           {isLink &&
             createPortal(<FloatingLinkEditor editor={editor} />, document.body)}
           <Divider />
