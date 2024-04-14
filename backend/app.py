@@ -140,7 +140,7 @@ class NarrativeNest :
     @cross_origin()  # Allow requests from different origins
     def generate_storyboard(self):
         script = request.json.get('script')
-        # Generate prompts from the script
+        # # Generate prompts from the script
         try:
             prompts = generate_prompts_from_script(script)
             app.logger.info("Successfully generated prompts from script.\n\n")
@@ -182,7 +182,7 @@ class NarrativeNest :
         except Exception as e:
             app.logger.error(f"Failed to generate images from prompts: {e}")
             return jsonify({"error": "Failed to generate images from prompts"}), 500
-
+        # images=['https://replicate.delivery/pbxt/xVHzI0yl4k4pDx6bhzIIbGSRsGcWv9ctW7vAEmy6jRXjOlqE/out-0.png', 'https://replicate.delivery/pbxt/e5W7o2N2tkywZKYK5AaOprtx50kmtcaghpP6KaRj0UZJdKVJA/out-0.png', 'https://replicate.delivery/pbxt/PrpDpmZtLLITMZaIOXzBQP8vFcVIDoTuMhKkIwuHuCilOlqE/out-0.png', 'https://replicate.delivery/pbxt/LBYymODASu4sDFfbHf2TkPbi3k5N8cqZyYOX1fq5Jj9x0pUlA/out-0.png', 'https://replicate.delivery/pbxt/SkFseldhUPWbJKdnZ20VlYqRAEcuCljiWA7dX9prth2OdKVJA/out-0.png', 'https://replicate.delivery/pbxt/UexKEDnkepkztkUj76D3XhhC1pzeh6YGjUokqThhaKVA1pUlA/out-0.png']
           # Combine scene details with corresponding image URLs
         scenes_response = []
         for details, img_url in zip(scene_details, images):

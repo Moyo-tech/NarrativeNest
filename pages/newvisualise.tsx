@@ -33,7 +33,7 @@ interface StoryboardElement {
   "Image URL": string;
 }
 
-const newvisual = () => {
+const Newvisual = () => {
   const [script, setScript] = useState("");
   const [storyboards, setStoryboards] = useState<StoryboardElement[]>([]);
   const [loading, setLoading] = useState(false); // New state to track loading
@@ -234,14 +234,14 @@ const newvisual = () => {
                   <>
                     <div className="relative flex flex-col mt-6 text-gray-700 bg-white shadow-md bg-clip-border rounded-xl w-80">
                       <div className="relative mx-4 -mt-6 overflow-hidden text-white shadow-lg bg-clip-border rounded-xl bg-blue-gray-500 shadow-blue-gray-500/40">
-                        <img
+                        <Image
                           src={storyboards["Image URL"]}
                           loading="lazy"
                           alt="card-image"
-                          // layout="responsive"
-                          // width={500}
-                          // height={500}
-                          // quality={75} // Value between 1 and 100
+                           layout="responsive"
+                           width={500}
+                           height={500}
+                          quality={75} // Value between 1 and 100
                         />
                       </div>
 
@@ -279,4 +279,4 @@ const newvisual = () => {
   );
 };
 
-export default newvisual;
+export default Newvisual;

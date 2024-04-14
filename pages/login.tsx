@@ -58,7 +58,7 @@ export default function Login() {
                 Sign In
               </Link>
               <p className="text-sm font-light text-gray-400">
-                Don't have an account?
+                Dont have an account?
                 <Link
                   href="/signup"
                   className="font-medium hover:underline text-primary-500"
