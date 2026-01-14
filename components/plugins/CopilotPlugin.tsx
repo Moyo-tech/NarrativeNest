@@ -1,282 +1,358 @@
-import {
-  ChatHistory,
-  Message,
-  ActionIconMap,
-} from "@/types/data";
-import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
+'use client'
 
-import {
-  $getRoot,
-  $createParagraphNode,
-  $createTextNode,
-} from "lexical";
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
+import { $getRoot, $createParagraphNode } from 'lexical'
+import { $convertFromMarkdownString, $convertToMarkdownString, TRANSFORMERS } from '@lexical/markdown'
+import { useEffect, useRef, useState, useCallback } from 'react'
+import { HiUser } from 'react-icons/hi2'
+import { FiSend, FiZap, FiTrash2, FiCopy, FiCheck, FiFileText } from 'react-icons/fi'
+import Markdown from '../Markdown/Markdown'
+import type { Setting } from '@/types/data'
 
-import { $convertFromMarkdownString, TRANSFORMERS } from "@lexical/markdown";
-
-import { useEffect, useRef, useState } from "react";
-import ReactMarkdown from "react-markdown";
-import { HiSparkles, HiUser } from "react-icons/hi2";
-import { FiMoreHorizontal, FiSend } from "react-icons/fi";
-
-import Markdown from "../Markdown/Markdown";
-
-function ChatMessage({ msg, addText }) {
-  let className = "p-2 my-2 rounded flex";
-  if (msg.role == "assistant") {
-    className += " hover:bg-gray-200 cursor-pointer";
-  }
-  return (
-    <div
-      key={msg.key}
-      className={className}
-      onClick={msg.role == "assistant" ? () => addText(msg.content) : undefined}
-    >
-      <div className="mr-2">
-        {msg.role == "assistant" && (
-          <HiSparkles size="1.2rem" className=" text-gray-400" />
-        )}
-        {msg.role == "user" && (
-          <HiUser size="1.2rem" className=" text-gray-400" />
-        )}
-      </div>
-      <Markdown content={msg.content} />
-    </div>
-  );
+interface ChatMessage {
+  id: string
+  role: 'user' | 'assistant' | 'system'
+  content: string
+  timestamp: number
 }
 
-function Conversation({ item, index, onChatUpdate, addText, setting }) {
-  const [loading, setLoading] = useState(false);
-  const [answer, setAnswer] = useState<String>("");
-  const [started, setStarted] = useState<boolean>(false);
+interface CopilotPluginProps {
+  setting: Setting
+  history?: any[] // Keep for compatibility but not used
+  onChatUpdate?: () => void // Keep for compatibility but not used
+}
 
-  const stopConversationRef = useRef<boolean>(false);
+const STORAGE_KEY = 'narrativenest-chat-history'
 
-  const firstRunRef = useRef<boolean>(false);
+export default function CopilotPlugin({ setting }: CopilotPluginProps) {
+  const [editor] = useLexicalComposerContext()
+  const [messages, setMessages] = useState<ChatMessage[]>([])
+  const [input, setInput] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
+  const [copiedId, setCopiedId] = useState<string | null>(null)
+  const messagesEndRef = useRef<HTMLDivElement>(null)
+  const textAreaRef = useRef<HTMLTextAreaElement>(null)
 
-  const [chat, setChat] = useState<ChatHistory>(item);
-
-  const [initial, setInitial] = useState<boolean>(false);
-  const [reply, setReply] = useState<string>("");
-  const textAreaRef = useRef<HTMLTextAreaElement>(null);
-
-  // console.log("Conversation", item.id, item.task, item.messages)
-  async function inference(task, selection) {
-    if (loading) {
-      return;
+  // Load chat history from localStorage
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY)
+      if (saved) {
+        const parsed = JSON.parse(saved)
+        if (Array.isArray(parsed)) {
+          setMessages(parsed)
+        }
+      }
+    } catch (error) {
+      console.warn('Failed to load chat history:', error)
     }
-    setLoading(true);
+  }, [])
 
-    // const prompt = question
-    const controller = new AbortController();
-    const response = await fetch("/narrativenest/api/writer2", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      signal: controller.signal,
-      body: JSON.stringify({ ...item, apiKey: setting.apiKey }),
-    });
+  // Save chat history to localStorage
+  useEffect(() => {
+    if (messages.length > 0) {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(messages))
+      } catch (error) {
+        console.warn('Failed to save chat history:', error)
+      }
+    }
+  }, [messages])
 
-    if (!response.ok) {
-      setLoading(false);
-      // setMessageError(true);
-      alert(response.statusText);
+  // Auto-scroll to bottom when new messages arrive
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [messages])
+
+  // Auto-resize textarea
+  useEffect(() => {
+    if (textAreaRef.current) {
+      textAreaRef.current.style.height = '0px'
+      const scrollHeight = Math.min(textAreaRef.current.scrollHeight, 150)
+      textAreaRef.current.style.height = scrollHeight + 'px'
+    }
+  }, [input])
+
+  // Get document context
+  const getDocumentContext = useCallback(() => {
+    let context = ''
+    editor.getEditorState().read(() => {
+      context = $convertToMarkdownString(TRANSFORMERS)
+    })
+    return context.substring(0, 2000) // Limit context size
+  }, [editor])
+
+  // Send message
+  const sendMessage = async () => {
+    if (!input.trim() || isLoading) return
+
+    const userMessage: ChatMessage = {
+      id: `msg-${Date.now()}`,
+      role: 'user',
+      content: input.trim(),
+      timestamp: Date.now(),
     }
 
-    const data = response.body;
-    if (!data) {
-      setLoading(false);
-      // setMessageError(true);
-      return;
-    }
-    const reader = data.getReader();
-    const decoder = new TextDecoder();
-    let done = false;
-    let text = "";
+    const newMessages = [...messages, userMessage]
+    setMessages(newMessages)
+    setInput('')
+    setIsLoading(true)
 
-    console.log(item.messages);
+    try {
+      // Get document context for the AI
+      const documentContext = getDocumentContext()
 
-    while (!done) {
-      console.log("stopConversation", stopConversationRef.current);
-      if (stopConversationRef.current === true) {
-        console.log("Aborting");
-        controller.abort();
-        done = true;
-        break;
+      // Build messages for API
+      const apiMessages = [
+        {
+          role: 'system',
+          content: `${setting.globalPrompt || 'You are a helpful creative writing assistant.'}
+
+You are helping a writer with their work. Be concise, helpful, and creative.
+If the user asks about their document, here is the current content:
+
+---
+${documentContext || '(Document is empty)'}
+---
+
+Provide thoughtful suggestions, answer questions about writing craft, help with ideas, and assist with any writing-related tasks.`,
+        },
+        ...newMessages.slice(-10).map((m) => ({
+          role: m.role,
+          content: m.content,
+        })),
+      ]
+
+      const response = await fetch('/api/writer2', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: apiMessages,
+          temperature: setting.temperature || 0.7,
+          maxTokens: 1000,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to get response')
       }
 
-      const { value, done: doneReading } = await reader.read();
-      done = doneReading;
-      const chunkValue = decoder.decode(value);
-      text += chunkValue;
-      setAnswer(text);
+      // Stream the response
+      const reader = response.body?.getReader()
+      if (!reader) throw new Error('No response body')
+
+      const decoder = new TextDecoder()
+      let assistantContent = ''
+      const assistantId = `msg-${Date.now()}-assistant`
+
+      // Add placeholder for assistant message
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: assistantId,
+          role: 'assistant',
+          content: '',
+          timestamp: Date.now(),
+        },
+      ])
+
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) break
+        assistantContent += decoder.decode(value, { stream: true })
+
+        // Update assistant message with streamed content
+        setMessages((prev) =>
+          prev.map((m) => (m.id === assistantId ? { ...m, content: assistantContent } : m))
+        )
+      }
+
+      // Final decode
+      assistantContent += decoder.decode()
+      setMessages((prev) =>
+        prev.map((m) => (m.id === assistantId ? { ...m, content: assistantContent } : m))
+      )
+    } catch (error) {
+      console.error('Chat error:', error)
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `msg-${Date.now()}-error`,
+          role: 'assistant',
+          content: 'Sorry, I encountered an error. Please try again.',
+          timestamp: Date.now(),
+        },
+      ])
+    } finally {
+      setIsLoading(false)
     }
-    onChatUpdate(item.id, "assistant", text);
-    setLoading(false);
-    setAnswer("");
   }
 
-  useEffect(() => {
-    console.log("Copilot useEffect", item.id, firstRunRef.current);
-    // automatically run on creation of new chat
-    async function infer() {
-      console.log("infer", item.id, item.messages, item.selection);
-      if (item.messages.length == 2 && item.selection.trim() !== "") {
-        firstRunRef.current = true;
-        await inference(item.task, item.selection);
-      }
+  // Insert text into editor
+  const insertToEditor = (text: string) => {
+    editor.update(() => {
+      const root = $getRoot()
+      const paragraphNode = $createParagraphNode()
+      $convertFromMarkdownString(text, TRANSFORMERS, paragraphNode)
+      root.append(paragraphNode)
+      root.append($createParagraphNode())
+    })
+  }
+
+  // Copy text to clipboard
+  const copyToClipboard = async (text: string, id: string) => {
+    try {
+      await navigator.clipboard.writeText(text)
+      setCopiedId(id)
+      setTimeout(() => setCopiedId(null), 2000)
+    } catch (error) {
+      console.error('Failed to copy:', error)
     }
-    console.log("firstRunRef.current", firstRunRef.current);
-    if (firstRunRef.current === false) {
-      infer();
-      console.log("RAN", firstRunRef.current);
-    }
-  }, []);
+  }
 
-  // const renderIcon = () => {
-  //   const Icon = task.icon;
-  //   return (<div className="flex p-2"><Icon size="1.2rem" className="mr-2 text-gray-400" />{task.description}</div>);
-  // };
-
-  const renderIcon = (task_id) => {
-    let task;
-    for (let i = 0; i < setting.actionPrompts.length; i++) {
-      const t = setting.actionPrompts[i];
-      if (t.id == task_id) {
-        task = t;
-        break;
-      }
-    }
-
-    let icon = task.id;
-    if (!ActionIconMap.hasOwnProperty(task.id)) {
-      icon = "custom";
-    }
-    const Icon = ActionIconMap[icon];
-    return (
-      <div className="flex p-2">
-        <Icon size="1.2rem" className="mr-2 text-gray-400" />
-        {task.name}
-      </div>
-    );
-  };
-
-  const isMobile = () => {
-    const userAgent =
-      typeof window.navigator === "undefined" ? "" : navigator.userAgent;
-    const mobileRegex =
-      /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|mobile|CriOS/i;
-    return mobileRegex.test(userAgent);
-  };
-
-  useEffect(() => {
-    if (textAreaRef && textAreaRef.current) {
-      if (reply == "") {
-        return;
-      }
-      // We need to reset the height momentarily to get the correct scrollHeight for the textarea
-      textAreaRef.current.style.height = "0px";
-      const scrollHeight = textAreaRef.current.scrollHeight;
-
-      // We then set the height directly, outside of the render loop
-      // Trying to set this with state or a ref will product an incorrect value.
-      textAreaRef.current.style.height = scrollHeight + "px";
-    }
-  }, [textAreaRef.current, reply]);
+  // Clear chat history
+  const clearHistory = () => {
+    setMessages([])
+    localStorage.removeItem(STORAGE_KEY)
+  }
 
   return (
-    <div
-      key={index}
-      className={`p-2 h-auto hover:bg-gray-100 text-gray-500 hover:text-gray-900 bg-gray-50 rounded ${
-        index > 0 ? "mt-6" : ""
-      }`}
-    >
-      {renderIcon(item.task)}
-
-      <div className="p-2 mb-2 border-b-0">
-        <Markdown content={item.selection} />
-      </div>
-      {item.messages.slice(2).map((msg: Message, j) => (
-        <ChatMessage key={j} msg={msg} addText={addText} />
-      ))}
-      {((loading && answer == "") || answer) && (
-        <div className="p-2 my-2 rounded flex">
-          <div className="mr-2">
-            <HiSparkles size="1.2rem" className="text-gray-400" />
+    <div className="h-full flex flex-col bg-primary-950">
+      {/* Header */}
+      <div className="flex-shrink-0 px-4 py-3 border-b border-primary-700/30 bg-primary-900/50">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-accent-700/20 flex items-center justify-center">
+              <FiZap className="w-4 h-4 text-accent-400" />
+            </div>
+            <div>
+              <h3 className="text-sm font-semibold text-white">Writing Assistant</h3>
+              <p className="text-xs text-neutral-400">Free-form chat</p>
+            </div>
           </div>
-          {answer && <Markdown content={answer} />}
-          {loading && answer == "" && (
-            <FiMoreHorizontal size="1.2rem" className="animate-pulse" />
+          {messages.length > 0 && (
+            <button
+              onClick={clearHistory}
+              className="p-2 rounded-lg text-neutral-400 hover:text-red-400 hover:bg-red-900/20 transition-colors"
+              title="Clear chat history"
+            >
+              <FiTrash2 className="w-4 h-4" />
+            </button>
           )}
         </div>
-      )}
+      </div>
 
-      <div className="relative flex w-full flex-grow flex-col rounded-md  bg-white">
-        <textarea
-          className="rounded outline-none p-2 w-full"
-          placeholder="Type message..."
-          ref={textAreaRef}
-          rows={1}
-          value={reply}
-          onChange={(e) => setReply(e.target.value)}
-          onKeyDown={async (e) => {
-            if (e.key === "Enter" && !isMobile() && !e.shiftKey) {
-              e.preventDefault();
-              console.log("do validate");
-              onChatUpdate(item.id, "user", reply);
-              setReply("");
-              const txt = await inference(item.task, reply);
-              return;
-            }
-          }}
-        />
-        <button
-          className="absolute right-2 top-2 rounded-sm p-1 text-gray-500 hover:bg-gray-200 hover:text-gray-900 opacity-60"
-          onClick={async (e) => {
-            onChatUpdate(item.id, "user", reply);
-            setReply("");
-            const txt = await inference(item.task, reply);
-            return;
-          }}
-        >
-          <FiSend size="1.2rem" />
-        </button>
+      {/* Messages */}
+      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        {messages.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-full text-center px-4">
+            <div className="w-16 h-16 rounded-2xl bg-accent-700/10 flex items-center justify-center mb-4">
+              <FiZap className="w-8 h-8 text-accent-400" />
+            </div>
+            <h3 className="text-lg font-semibold text-neutral-200 mb-2">Writing Assistant</h3>
+            <p className="text-sm text-neutral-400 max-w-xs mb-4">
+              Ask me anything about your writing. I can help with:
+            </p>
+            <ul className="text-sm text-neutral-500 space-y-1 text-left">
+              <li>- General writing questions</li>
+              <li>- Help with paragraphs or scenes</li>
+              <li>- Brainstorming ideas</li>
+              <li>- Feedback on your work</li>
+              <li>- Writing tips and techniques</li>
+            </ul>
+          </div>
+        ) : (
+          <>
+            {messages.map((msg) => (
+              <div
+                key={msg.id}
+                className={`flex gap-3 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}
+              >
+                <div className="flex-shrink-0">
+                  {msg.role === 'assistant' ? (
+                    <div className="w-8 h-8 rounded-full bg-accent-700/20 flex items-center justify-center">
+                      <FiZap className="w-4 h-4 text-accent-400" />
+                    </div>
+                  ) : (
+                    <div className="w-8 h-8 rounded-full bg-primary-700/30 flex items-center justify-center">
+                      <HiUser className="w-4 h-4 text-neutral-400" />
+                    </div>
+                  )}
+                </div>
+                <div
+                  className={`flex-1 max-w-[85%] ${msg.role === 'user' ? 'text-right' : ''}`}
+                >
+                  <div
+                    className={`inline-block p-3 rounded-xl ${
+                      msg.role === 'user'
+                        ? 'bg-accent-700/30 text-white'
+                        : 'bg-primary-800/50 text-neutral-200'
+                    }`}
+                  >
+                    <Markdown content={msg.content} />
+                  </div>
+                  {msg.role === 'assistant' && msg.content && (
+                    <div className="flex gap-1 mt-1">
+                      <button
+                        onClick={() => copyToClipboard(msg.content, msg.id)}
+                        className="p-1.5 rounded text-neutral-500 hover:text-neutral-300 hover:bg-primary-800/50 transition-colors"
+                        title="Copy to clipboard"
+                      >
+                        {copiedId === msg.id ? (
+                          <FiCheck className="w-3.5 h-3.5 text-green-400" />
+                        ) : (
+                          <FiCopy className="w-3.5 h-3.5" />
+                        )}
+                      </button>
+                      <button
+                        onClick={() => insertToEditor(msg.content)}
+                        className="p-1.5 rounded text-neutral-500 hover:text-neutral-300 hover:bg-primary-800/50 transition-colors"
+                        title="Insert into editor"
+                      >
+                        <FiFileText className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+            <div ref={messagesEndRef} />
+          </>
+        )}
+      </div>
+
+      {/* Input */}
+      <div className="flex-shrink-0 p-4 border-t border-primary-700/30 bg-primary-900/30">
+        <div className="relative flex items-end gap-2">
+          <div className="flex-1 relative">
+            <textarea
+              ref={textAreaRef}
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault()
+                  sendMessage()
+                }
+              }}
+              placeholder="Ask about your writing..."
+              className="w-full rounded-xl bg-primary-800/50 border border-primary-700/30 px-4 py-3 pr-12 text-neutral-200 placeholder-neutral-500 outline-none focus:border-accent-600/50 focus:ring-2 focus:ring-accent-600/20 transition-all resize-none"
+              rows={1}
+              disabled={isLoading}
+            />
+            <button
+              onClick={sendMessage}
+              disabled={!input.trim() || isLoading}
+              className="absolute right-2 bottom-2 p-2 rounded-lg text-accent-400 hover:bg-accent-700/20 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              <FiSend className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+        <p className="text-xs text-neutral-600 mt-2 text-center">
+          Press Enter to send, Shift+Enter for new line
+        </p>
       </div>
     </div>
-  );
-}
-
-export default function CopilotPlugin({ setting, history, onChatUpdate }) {
-  const [editor] = useLexicalComposerContext();
-  console.log("CopilotPlugin", history);
- 
-
-  const addText = (text: string) => {
-    editor.update(() => {
-      const root = $getRoot();
-      const paragraphNode = $createParagraphNode();
-      // const textNode = $createTextNode(text);
-      // paragraphNode.append(textNode);
-      root.append(paragraphNode);
-      $convertFromMarkdownString(text, TRANSFORMERS, paragraphNode);
-      root.append($createParagraphNode());
-      console.log("UPDATING");
-    });
-  };
-
-
-  return (
-    <>
-      {history.map((item: ChatHistory, index) => (
-        <Conversation
-          setting={setting}
-          key={item.id}
-          index={index}
-          item={item}
-          addText={addText}
-          onChatUpdate={onChatUpdate}
-        />
-      ))}
-    </>
-  );
+  )
 }

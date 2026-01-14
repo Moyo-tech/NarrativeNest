@@ -1,3 +1,5 @@
+'use client'
+
 import { $createCodeNode, $isCodeNode } from "@lexical/code";
 import {
   $convertFromMarkdownString,

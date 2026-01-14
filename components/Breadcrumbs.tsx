@@ -1,15 +1,12 @@
+'use client'
+
 import * as React from "react";
 import { Breadcrumbs } from "@mui/material";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import { styled } from "@mui/system";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 
-
-interface CustomLinkProps {
-  theme: any; // Consider replacing `any` with a specific theme interface
-}
-
-const CustomLink = styled(Link)(({ theme }: CustomLinkProps) => ({
+const CustomLink = styled(Link)({
   textDecoration: "none",
   color: "inherit",
   transition: "color 0.3s ease-in-out",
@@ -17,7 +14,7 @@ const CustomLink = styled(Link)(({ theme }: CustomLinkProps) => ({
     color: "#25245D",
     fontWeight: "600",
   },
-}));
+});
 
 interface BreadcrumbProps {
   name: string;
@@ -33,12 +30,12 @@ const Breadcrumb: React.FC<BreadcrumbProps> = ({ name, firstItem, linkTo }) => {
         separator={<NavigateNextIcon fontSize="medium" />}
         sx={{ fontSize: "14px", cursor: "pointer", color: "#25245D"}}
       >
-        <CustomLink to={`/${linkTo}`}>{firstItem}</CustomLink>
-        <CustomLink to="" aria-current="page">{
+        <CustomLink href={`/${linkTo}`}>{firstItem}</CustomLink>
+        <span aria-current="page" style={{ color: "inherit" }}>{
           name.split(" ")
               .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
               .join(" ")
-        }</CustomLink>
+        }</span>
       </Breadcrumbs>
     </div>
   );

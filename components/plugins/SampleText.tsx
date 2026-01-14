@@ -1,3 +1,5 @@
+'use client'
+
 import { $createParagraphNode, $createTextNode, $getRoot } from "lexical";
 import { $createListItemNode, $createListNode } from "@lexical/list";
 import { $createHeadingNode, $createQuoteNode } from "@lexical/rich-text";

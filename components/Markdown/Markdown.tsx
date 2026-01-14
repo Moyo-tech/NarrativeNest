@@ -4,25 +4,28 @@ import { MemoizedReactMarkdown } from "./MemoizedReactMarkdown";
 // import remarkMath from 'remark-math';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { prism } from 'react-syntax-highlighter/dist/cjs/styles/prism';
-import { memo } from 'react';
+import React, { memo } from 'react';
 
-const Markdown = memo(function Markdown({ content }) {
+interface MarkdownProps {
+    content: string;
+}
+
+const Markdown = memo(function Markdown({ content }: MarkdownProps) {
     return <MemoizedReactMarkdown
         className="prose dark:prose-invert markdown"
         // remarkPlugins={[remarkGfm, remarkMath]}
         // rehypePlugins={[rehypeMathjax]}
         linkTarget="_blank"
         components={{
-            code({ node, inline, className, children, ...props }) {
+            code({ node, inline, className, children, ...props }: any) {
                 const match = /language-(\w+)/.exec(className || '');
 
                 return !inline && match ? (
                     <SyntaxHighlighter
                         key={Math.random()}
                         language={match[1]}
-                        style={ prism }
+                        style={prism as any}
                         customStyle={{ margin: 0 }}
-                        {...props}
                     >
                         {String(children).replace(/\n$/, '')}
                     </SyntaxHighlighter>

@@ -1,7 +1,7 @@
-import React from "react";
+import React, { CSSProperties } from "react";
 
 const Background = () => {
-  const noiseStyle = {
+  const noiseStyle: CSSProperties = {
     position: "fixed",
     height: "100vh",
     width: "100vw",
@@ -11,7 +11,7 @@ const Background = () => {
     backgroundImage: "url('https://uploads-ssl.webflow.com/62c435401c8f7261df7dac30/62c5acd6c07e3c25ed49ea71_624d5860b71355f93453ff75_grain.gif')",
   };
 
-  const gradientStyle = {
+  const gradientStyle: CSSProperties = {
     position: "fixed",
     zIndex: -2,
     height: "100vh",

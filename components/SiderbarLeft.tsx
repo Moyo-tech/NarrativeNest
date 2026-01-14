@@ -1,105 +1,99 @@
+'use client'
+
 import React from "react";
-import { Button } from "@mui/material";
-import InputLabel from "@mui/material/InputLabel";
-import MenuItem from "@mui/material/MenuItem";
-import FormControl from "@mui/material/FormControl";
-import Select from "@mui/material/Select";
-import TextField from "@mui/material/TextField";
-import Divider from "@mui/material/Divider";
-import axios from "axios";
+import axios from "../lib/axios";
 import { useState } from "react";
 import { useUpdateGeneratedTitle } from "../context/TitleContext";
-import { SelectChangeEvent } from "@mui/material";
+import { API_ENDPOINTS } from "../lib/config";
+import { Button, Textarea, Select } from "@/components/ui";
 
 const SiderbarLeft: React.FC = () => {
   const [logline, setLogline] = useState<string>("");
   const [genrePrefix, setGenrePrefix] = useState<string>("");
   const [generatedTitle, setGeneratedTitle] = useState<string>("");
   const updateGeneratedTitle = useUpdateGeneratedTitle();
-  const [generationSuccess, setGenerationSuccess] = useState<boolean>(false); // New state
+  const [generationSuccess, setGenerationSuccess] = useState<boolean>(false);
+  const [isGenerating, setIsGenerating] = useState<boolean>(false);
 
-  const handleLoglineChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleLoglineChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setLogline(event.target.value);
   };
 
-  const handleGenrePrefixChange = (event: SelectChangeEvent<string>) => {
-    setGenrePrefix(event.target.value as string);
+  const handleGenrePrefixChange = (value: string) => {
+    setGenrePrefix(value);
   };
 
   const handleStoryGeneration = async () => {
     try {
-      setGenerationSuccess(false); // Reset success state
+      setGenerationSuccess(false);
+      setIsGenerating(true);
       const response = await axios.post(
-        "http://localhost:5000/api/generate-story",
+        API_ENDPOINTS.generateStory,
         {
           logline,
           genre_prefix: genrePrefix,
         }
       );
-      console.log("story generator is setupp");
-      setGenerationSuccess(true); // Reset success state
-
+      console.log("story generator is setup");
+      setGenerationSuccess(true);
+      setIsGenerating(false);
     } catch (error) {
       console.error("Error:", error);
+      setIsGenerating(false);
     }
   };
 
+  const genreOptions = [
+    { value: "medea_prefixes", label: "Drama Prefix" },
+    { value: "scifi_prefixes", label: "Comedy Prefix" },
+    { value: "custom_prefixes", label: "Folktales Prefix" },
+  ];
+
   return (
-    <div style={{ marginTop: "40px", marginBottom: "20px" }} className="text-xs">
-      <p className="text-md">Generate your story from your logline</p>
-      <Divider style={{ marginTop: "20px", marginBottom: "20px" }} />
-      <p
-        style={{ fontSize: "14px", fontWeight: "bold", paddingBottom: "10px" }}
-      >
-        Enter your logline
-      </p>
-      <TextField
-        id="outlined-textarea"
-        placeholder="Once upon a time..."
-        multiline
-        rows={4}
-        value={logline}
-        onChange={handleLoglineChange}
-        className="w-full"
-        style={{ marginBottom: "20px", borderRadius: "10px", borderColor: 'black' }}
-      />
-      <FormControl fullWidth>
-        <InputLabel id="demo-simple-select-label">Genre</InputLabel>
+    <div className="space-y-4">
+      <div>
+        <h3 className="text-lg font-semibold text-white mb-2">
+          Generate your story from your logline
+        </h3>
+        <div className="w-full h-px bg-primary-700/30 my-4" />
+      </div>
+
+      <div className="space-y-4">
+        <Textarea
+          label="Enter your logline"
+          placeholder="Once upon a time..."
+          rows={4}
+          value={logline}
+          onChange={handleLoglineChange}
+          className="w-full"
+        />
+
         <Select
-          labelId="demo-simple-select-label"
-          placeholder="Sci-fi Prefix"
-          id="demo-simple-select"
+          label="Genre"
+          placeholder="Select a genre..."
+          options={genreOptions}
           value={genrePrefix}
           onChange={handleGenrePrefixChange}
-          label="Age"
-          style={{ borderRadius: "10px", fontSize: 14 }}
+        />
+
+        <Button
+          variant="primary"
+          className="w-full"
+          onClick={handleStoryGeneration}
+          isLoading={isGenerating}
+          disabled={!logline || !genrePrefix}
         >
-          <MenuItem value="medea_prefixes">Drama Prefix</MenuItem>
-          <MenuItem value="scifi_prefixes">Comedy Prefix</MenuItem>
-          <MenuItem value="custom_prefixes">Folktales Prefix</MenuItem>
-        </Select>
-      </FormControl>
+          {isGenerating ? "Generating..." : "Write"}
+        </Button>
 
-      <button
-        onClick={handleStoryGeneration}
-        className="mt-4 text-xs w-full text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700"
-      >
-        Write
-      </button>
-      {generationSuccess && (
-            <p
-              style={{
-                background: "linear-gradient(45deg, #6EE7B7, #3B82F6)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                display: "inline",
-
-                textAlign: "center",
-              }}
-            >
-Story Generator Created            </p>
+        {generationSuccess && (
+          <div className="text-center p-3 rounded-xl bg-gradient-to-r from-green-500/20 to-blue-500/20 border border-green-500/30">
+            <p className="text-green-300 font-medium">
+              Story Generated Successfully! ✨
+            </p>
+          </div>
         )}
-
+      </div>
     </div>
   );
 };

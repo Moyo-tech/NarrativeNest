@@ -1,4 +1,18 @@
-export type TaskType = "improve" | "expand" | "shorten" | "continue";
+export type TaskType =
+  | "improve"
+  | "expand"
+  | "shorten"
+  | "continue"
+  | "elaborate"
+  | "rewrite"
+  | "dialoguesuggestion"
+  | "dialoguetone"
+  | "characterprofiles"
+  | "plotdevelopment"
+  | "scenedescription"
+  | "brainstorm"
+  | "chat"
+  | "custom";
 export type TaskTone =
   | "causal"
   | "semicasual"
@@ -18,7 +32,7 @@ import {
   FiGrid,
 } from "react-icons/fi";
 
-type Role = "assistant" | "user";
+export type Role = "assistant" | "user" | "system";
 export interface Message {
   role: Role;
   content: string;
@@ -33,12 +47,36 @@ export interface ChatHistory {
   temperature: number;
 }
 
+// Chapter/Scene types for hierarchical document structure
+export type ChapterType = 'act' | 'chapter' | 'scene';
+
+export interface ChapterMetadata {
+  location?: string;
+  timeOfDay?: string;
+  characters?: string[];
+}
+
+export interface Chapter {
+  id: string;
+  title: string;
+  type: ChapterType;
+  position: number;
+  content: string; // Lexical editor state JSON
+  metadata?: ChapterMetadata;
+  parentId?: string; // For nested chapters (scenes under acts)
+  collapsed?: boolean; // UI state for tree view
+  createdAt: number;
+  updatedAt: number;
+}
+
 export interface Doc {
   id: string;
   title: string;
   prompt: string;
   data: string;
   history: ChatHistory[];
+  chapters: Chapter[]; // Hierarchical chapter structure
+  activeChapterId?: string; // Currently active chapter
   createdAt: number;
   updatedAt: number;
 }
@@ -262,11 +300,13 @@ export const DefaultSetting: Setting = {
   temperature: 0.5,
   apiKey: "",
   globalPrompt :`You are an experienced screenwriting and storywriting assistant. With a deep appreciation for the vibrant stories that shape Nollywood and the rich cultures of Nigeria,
-  You are assist users in crafting narratives screenplays that resonate with hearts and minds. You have a profound understanding of Nigerian cultures, traditions, and languages, 
+  You are assist users in crafting narratives screenplays that resonate with hearts and minds. You have a profound understanding of Nigerian cultures, traditions, and languages,
   offering users the ability to infuse their stories and scripts with authentic cultural details if they want to. You also encourage creativity, providing users with inspiration for characters, settings, and plotlines,
-   and helping them overcome writer's block. You interact with users, answer questions, offer feedback, and guiding them through their writing process. You're very knowledgable of the 
+   and helping them overcome writer's block. You interact with users, answer questions, offer feedback, and guiding them through their writing process. You're very knowledgable of the
    storytelling landscape and you stick to proven techniques but can also break the rules to discover new narrative dimensions. You follow the users instructions carefully.  All the output should be well organised with heading and in bullet points. `,
   actionPrompts: DefaultActions,
+  createdAt: Date.now(),
+  updatedAt: Date.now(),
 };
 
 // export const TasksMap = new Map(

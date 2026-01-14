@@ -1,9 +1,18 @@
-import { Fragment, useState, useEffect } from 'react';
+'use client'
+
+import { Fragment, useState, useEffect, ReactNode } from 'react';
 import { Combobox, Transition } from '@headlessui/react'
 import { Dialog } from '@headlessui/react'
 import { FiX } from 'react-icons/fi';
 
-export default function Modal({title, isOpen, setIsOpen, children}) {
+interface ModalProps {
+  title: string;
+  isOpen: boolean;
+  setIsOpen: (isOpen: boolean) => void;
+  children: ReactNode;
+}
+
+export default function Modal({ title, isOpen, setIsOpen, children }: ModalProps) {
 
 return <Transition appear show={isOpen} as={Fragment}>
         <Dialog as="div" className="relative z-10" onClose={(e)=>setIsOpen(false)}>
@@ -16,7 +25,7 @@ return <Transition appear show={isOpen} as={Fragment}>
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <div className="fixed inset-0 bg-black bg-opacity-25" />
+            <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" />
           </Transition.Child>
 
           <div className="fixed inset-0 overflow-y-auto ">
@@ -32,11 +41,11 @@ return <Transition appear show={isOpen} as={Fragment}>
                 leaveTo="opacity-0 scale-95"
               >
                 
-              <Dialog.Panel className="relative w-full max-w-3xl transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
-              <div className='absolute block mr-3 mt-3 p-3 border-0 border-solid right-0 top-0 cursor-pointer' onClick={(e) => setIsOpen(false)}><FiX/></div>
+              <Dialog.Panel className="relative w-full max-w-3xl transform overflow-hidden rounded-2xl bg-primary-900 border border-primary-700/30 p-6 text-left align-middle shadow-xl transition-all">
+              <div className='absolute block mr-3 mt-3 p-3 border-0 border-solid right-0 top-0 cursor-pointer text-neutral-400 hover:text-white transition-colors' onClick={(e) => setIsOpen(false)}><FiX/></div>
                   <Dialog.Title
                     as="h3"
-                    className="text-lg font-medium leading-6 text-gray-900 mb-4"
+                    className="text-lg font-medium leading-6 text-white mb-4"
                   >
                   {title}
                   </Dialog.Title>

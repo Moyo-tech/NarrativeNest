@@ -1,3 +1,5 @@
+'use client'
+
 import React from "react";
 import { AppBar, Toolbar } from "@mui/material";
 import Breadcrumb from "../Breadcrumbs"; // Adjust import path as necessary

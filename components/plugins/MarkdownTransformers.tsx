@@ -1,3 +1,5 @@
+'use client'
+
 import type { ElementTransformer, Transformer } from "@lexical/markdown";
 import type { LexicalNode } from "lexical";
 

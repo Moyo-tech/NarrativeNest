@@ -1,3 +1,5 @@
+'use client'
+
 import React from "react";
 import Storycard from "./Storycomponent/Storycard";
 import CharacterComp from "./Storycomponent/CharacterComp";

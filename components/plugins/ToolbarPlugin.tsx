@@ -1,18 +1,21 @@
+'use client'
+
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   SELECTION_CHANGE_COMMAND,
   FORMAT_TEXT_COMMAND,
-  FORMAT_ELEMENT_COMMAND, 
+  FORMAT_ELEMENT_COMMAND,
   $getSelection,
   $isRangeSelection,
   $createParagraphNode,
   $getNodeByKey,
-$setSelection,
-$createRangeSelection
+  LexicalEditor,
+  RangeSelection,
+  NodeSelection,
+  GridSelection,
 } from "lexical";
 
-import { ActionIconMap } from "@/types/data";
 
 import { BsTypeBold, BsTypeItalic, BsTypeUnderline, BsTypeStrikethrough, BsTypeH1, BsTypeH2, BsListUl, BsListOl, BsCode, BsLink, BsQuote, BsTextParagraph, BsTextLeft, BsTextRight, BsTextCenter,  } from 'react-icons/bs';
 
@@ -41,7 +44,6 @@ import {
 
 import {
   $convertFromMarkdownString,
-  $convertToMarkdownString,
   TRANSFORMERS
 } from "@lexical/markdown";
 import { FiBook } from "react-icons/fi";
@@ -58,7 +60,7 @@ const supportedBlockTypes = new Set([
   "ol"
 ]);
 
-const blockTypeToBlockName = {
+const blockTypeToBlockName: Record<string, string> = {
   code: "Code Block",
   h1: "Large Heading",
   h2: "Small Heading",
@@ -75,7 +77,7 @@ function Divider() {
   return <div className="divider" />;
 }
 
-function positionEditorElement(editor, rect) {
+function positionEditorElement(editor: HTMLElement, rect: DOMRect | null) {
   if (rect === null) {
     editor.style.opacity = "0";
     editor.style.top = "-1000px";
@@ -89,13 +91,13 @@ function positionEditorElement(editor, rect) {
   }
 }
 
-function FloatingLinkEditor({ editor }) {
-  const editorRef = useRef(null);
-  const inputRef = useRef(null);
+function FloatingLinkEditor({ editor }: { editor: LexicalEditor }) {
+  const editorRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const mouseDownRef = useRef(false);
   const [linkUrl, setLinkUrl] = useState("");
   const [isEditMode, setEditMode] = useState(false);
-  const [lastSelection, setLastSelection] = useState(null);
+  const [lastSelection, setLastSelection] = useState<RangeSelection | NodeSelection | GridSelection | null>(null);
 
   const updateLinkEditor = useCallback(() => {
     const selection = $getSelection();
@@ -121,6 +123,7 @@ function FloatingLinkEditor({ editor }) {
     const rootElement = editor.getRootElement();
     if (
       selection !== null &&
+      nativeSelection !== null &&
       !nativeSelection.isCollapsed &&
       rootElement !== null &&
       rootElement.contains(nativeSelection.anchorNode)
@@ -128,7 +131,7 @@ function FloatingLinkEditor({ editor }) {
       const domRange = nativeSelection.getRangeAt(0);
       let rect;
       if (nativeSelection.anchorNode === rootElement) {
-        let inner = rootElement;
+        let inner: Element = rootElement;
         while (inner.firstElementChild != null) {
           inner = inner.firstElementChild;
         }
@@ -229,7 +232,14 @@ function FloatingLinkEditor({ editor }) {
   );
 }
 
-function Select({ onChange, className, options, value }) {
+interface SelectProps {
+  onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+  className: string;
+  options: string[];
+  value: string;
+}
+
+function Select({ onChange, className, options, value }: SelectProps) {
   return (
     <select className={className} onChange={onChange} value={value}>
       <option hidden={true} value="" />
@@ -242,7 +252,7 @@ function Select({ onChange, className, options, value }) {
   );
 }
 
-function getSelectedNode(selection) {
+function getSelectedNode(selection: RangeSelection) {
   const anchor = selection.anchor;
   const focus = selection.focus;
   const anchorNode = selection.anchor.getNode();
@@ -258,13 +268,20 @@ function getSelectedNode(selection) {
   }
 }
 
+interface BlockOptionsDropdownListProps {
+  editor: LexicalEditor;
+  blockType: string;
+  toolbarRef: React.RefObject<HTMLDivElement>;
+  setShowBlockOptionsDropDown: (show: boolean) => void;
+}
+
 function BlockOptionsDropdownList({
   editor,
   blockType,
   toolbarRef,
   setShowBlockOptionsDropDown
-}) {
-  const dropDownRef = useRef(null);
+}: BlockOptionsDropdownListProps) {
+  const dropDownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const toolbar = toolbarRef.current;
@@ -282,8 +299,8 @@ function BlockOptionsDropdownList({
     const toolbar = toolbarRef.current;
 
     if (dropDown !== null && toolbar !== null) {
-      const handle = (event) => {
-        const target = event.target;
+      const handle = (event: MouseEvent) => {
+        const target = event.target as Node;
 
         if (!dropDown.contains(target) && !toolbar.contains(target)) {
           setShowBlockOptionsDropDown(false);
@@ -338,18 +355,18 @@ function BlockOptionsDropdownList({
 
   const formatBulletList = () => {
     if (blockType !== "ul") {
-      editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND);
+      editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND, undefined);
     } else {
-      editor.dispatchCommand(REMOVE_LIST_COMMAND);
+      editor.dispatchCommand(REMOVE_LIST_COMMAND, undefined);
     }
     setShowBlockOptionsDropDown(false);
   };
 
   const formatNumberedList = () => {
     if (blockType !== "ol") {
-      editor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND);
+      editor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND, undefined);
     } else {
-      editor.dispatchCommand(REMOVE_LIST_COMMAND);
+      editor.dispatchCommand(REMOVE_LIST_COMMAND, undefined);
     }
     setShowBlockOptionsDropDown(false);
   };
@@ -404,11 +421,15 @@ function BlockOptionsDropdownList({
   );
 }
 
-export default function ToolbarPlugin({setting, onCreateChat, setIsChatOpen, isMobile, setIsPromptsOpen}) {
+interface ToolbarPluginProps {
+  setIsPromptsOpen: (isOpen: boolean) => void;
+}
+
+export default function ToolbarPlugin({ setIsPromptsOpen }: ToolbarPluginProps) {
   const [editor] = useLexicalComposerContext();
-  const toolbarRef = useRef(null);
+  const toolbarRef = useRef<HTMLDivElement>(null);
   const [blockType, setBlockType] = useState("paragraph");
-  const [selectedElementKey, setSelectedElementKey] = useState(null);
+  const [selectedElementKey, setSelectedElementKey] = useState<string | null>(null);
   const [showBlockOptionsDropDown, setShowBlockOptionsDropDown] = useState(
     false
   );
@@ -485,7 +506,7 @@ export default function ToolbarPlugin({setting, onCreateChat, setIsChatOpen, isM
 
   const codeLanguges = useMemo(() => getCodeLanguages(), []);
   const onCodeLanguageSelect = useCallback(
-    (e) => {
+    (e: React.ChangeEvent<HTMLSelectElement>) => {
       editor.update(() => {
         if (selectedElementKey !== null) {
           const node = $getNodeByKey(selectedElementKey);
@@ -508,56 +529,8 @@ export default function ToolbarPlugin({setting, onCreateChat, setIsChatOpen, isM
 
 
   
-  //https://stackoverflow.com/questions/75177766/is-there-a-way-to-make-an-async-request-inside-a-lexical-editor-update-in-react
-  function update(task: string) {
-    if(isMobile){
-      setIsChatOpen(true)
-    }
-    console.log("TASK", task)
-    let textContent = editor.getEditorState().read(() => $getSelection()?.getTextContent());
-    if(textContent === "" && task !== "chat"){
-      textContent = editor.getEditorState().read(() => $convertToMarkdownString(TRANSFORMERS));
-    }
-    console.log("CONTEXT", textContent)
-    // if(textContent === ""){
-    //     return;
-    // }
-    console.log("TOOLBAR", task)
-    onCreateChat(task, textContent)
-
-  //  // REPLACE SELECTED TEXT
-  // editor.update(() => {
-  //   const selection = $getSelection()
-  //   if (!$isRangeSelection(selection)) return;
-  //   if(selection){
-  //     selection.insertText(txt);
-  //     console.log(selection.getNodes());
-  //     console.log("START", selection.anchor.key, selection.anchor.offset);
-  //     console.log("END", selection.focus.key, selection.focus.offset);
-  //     const rangeSelection = $createRangeSelection();
-  //     const startKey = selection.anchor;
-  //     const endKey = selection.focus;
-  //     rangeSelection.focus.set(
-  //       startKey.key,
-  //       startKey.offset - txt.length,
-  //       "text"
-  //     );
-  //     rangeSelection.anchor.set(endKey.key, endKey.offset, "text");
-  //     $setSelection(rangeSelection);
-  //   }
-  // });
-  }
-
-  const renderIcon = (icon) => {
-    if(!ActionIconMap.hasOwnProperty(icon)){
-      icon = 'custom'
-    }
-    const Icon = ActionIconMap[icon];
-    return (<Icon className="opacity-50 hover:opacity-60"/>);
-  };
-
-  const renderBs = (icon) => {
-    const mapping = {
+  const renderBs = (icon: string) => {
+    const mapping: Record<string, React.ComponentType> = {
       "paragraph": BsTextParagraph,
       "h1": BsTypeH1,
       "h2": BsTypeH2,
@@ -567,6 +540,7 @@ export default function ToolbarPlugin({setting, onCreateChat, setIsChatOpen, isM
       "code": BsCode,
     }
     const Icon = mapping[icon];
+    if (!Icon) return null;
     return (<Icon />);
   };
 
@@ -574,9 +548,8 @@ export default function ToolbarPlugin({setting, onCreateChat, setIsChatOpen, isM
     <div className="toolbar flex-wrap" ref={toolbarRef}>
       {supportedBlockTypes.has(blockType) && (
         <><button onClick={(e) => setIsPromptsOpen(true)} className="toolbar-item spaced group">
-        
-
-        <FiBook className="opacity-50 hover:opacity-60 mr-1"/><span className="opacity-50 hover:opacity-60"> Prompts</span>
+        <i className="format"><FiBook /></i>
+        <span>Prompts</span>
         <p className="toolbar-tip">Prompts</p>
         </button>
           <button
@@ -676,17 +649,6 @@ export default function ToolbarPlugin({setting, onCreateChat, setIsChatOpen, isM
           </button>
           {isLink &&
             createPortal(<FloatingLinkEditor editor={editor} />, document.body)}
-          <Divider />
-            {setting.actionPrompts.map((task)=>{
-                return (<button key={task.id}
-                onClick={async () => {update(task.id);}}
-                className="toolbar-item spaced group"
-                aria-label={task.name}
-              >
-                {renderIcon(task.id)}
-                <p className="toolbar-tip">{task.name}</p>
-              </button>)
-            })}
 
         </>
       )}

@@ -1,11 +1,21 @@
+'use client'
+
 import { Setting, DefaultSetting, DefaultActions, Action} from '@/types/data';
-import { getSettings } from '@/components/utils/settings';
 
 import { useEffect, useContext, useState } from 'react';
 import { FiFile, FiGlobe, FiZap } from 'react-icons/fi';
 import { nanoid } from 'nanoid'
 
-export default function Prompts({ setIsOpen, docPrompt, setDocPrompt, setting, setSetting, onSaveDocPrompt }) {
+interface PromptsProps {
+  setIsOpen: (isOpen: boolean) => void;
+  docPrompt: string;
+  setDocPrompt: (prompt: string) => void;
+  setting: Setting;
+  setSetting: React.Dispatch<React.SetStateAction<Setting>>;
+  onSaveDocPrompt: (prompt: string) => void;
+}
+
+export default function Prompts({ setIsOpen, docPrompt, setDocPrompt, setting, setSetting, onSaveDocPrompt }: PromptsProps) {
     const [error, setError] = useState(null);
 
     const [tab, setTab] = useState("doc")
@@ -21,7 +31,7 @@ export default function Prompts({ setIsOpen, docPrompt, setDocPrompt, setting, s
     // const [actionPrompt, setActionPrompt] = useState<Action>(setting.actionPrompts[actionIndex]);
 
 
-    function handleChange(e) {
+    function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) {
         console.log(e.target.name, e.target.value)
         setSetting((setting) => ({
             ...setting,
@@ -29,14 +39,14 @@ export default function Prompts({ setIsOpen, docPrompt, setDocPrompt, setting, s
         }))
     }
 
-    function handleAPChange(e) {
+    function handleAPChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) {
         // console.log(actionPrompt, e.target.name, e.target.value)
         // setActionPrompt((actionPrompt) => ({
         //     ...actionPrompt,
         //     [e.target.name]: e.target.value
         // }))
         const aps : Action[] = [...setting.actionPrompts]
-        aps[actionIndex][e.target.name] = e.target.value
+        ;(aps[actionIndex] as any)[e.target.name] = e.target.value
         console.log("a[s", aps)
         setSetting((setting) => ({
             ...setting,
@@ -45,7 +55,7 @@ export default function Prompts({ setIsOpen, docPrompt, setDocPrompt, setting, s
         // let newValue = [...this.props[item].slice(0, index), value, ...this.props[item].slice(index + 1)];
     }
 
-    const onSave = (e) => {
+    const onSave = (e: React.MouseEvent) => {
         if(tab === 'doc'){
             onSaveDocPrompt(docPrompt)
         }else{
@@ -67,18 +77,18 @@ export default function Prompts({ setIsOpen, docPrompt, setDocPrompt, setting, s
         console.log("created", ap.id)
       }
 
-    function tabClass(current, active){
+    function tabClass(current: string, active: string){
         let c = 'px-3 py-2 flex cursor-pointer items-center rounded-md group-hover:bg-gray-200 after:absolute after:bottom-0 after:right-3 after:left-3 after:h-0.5 after:bg-blue-600'
         if(current == active){
             c += ' text-blue-600 after:visible'
         }else{
             c += ' text-gray-600 group-hover:text-gray-800 after:invisible'
         }
-    
+
         return c
     }
-    
-    function menuClass(current, active){
+
+    function menuClass(current: string, active: string){
         let className = 'px-4 py-2 p-3 rounded-md cursor-pointer break-all '
         if(current == active){
             className += 'text-blue-900 bg-blue-100'
@@ -127,13 +137,13 @@ export default function Prompts({ setIsOpen, docPrompt, setDocPrompt, setting, s
 
         {tab == "doc" &&
         <div className="flex flex-col">
-            <textarea id="docPrompt" name="docPrompt" className='textarea' placeholder='Enter document prompt' rows="8" value={docPrompt} onChange={(e) => setDocPrompt(e.target.value)}></textarea>
+            <textarea id="docPrompt" name="docPrompt" className='textarea' placeholder='Enter document prompt' rows={8} value={docPrompt} onChange={(e) => setDocPrompt(e.target.value)}></textarea>
         </div>
         }
 
         {tab == "global" &&
         <div className="flex flex-col">
-            <textarea id="globalPrompt" name="globalPrompt" className='textarea' placeholder='Enter global prompt' rows="8" value={setting.globalPrompt} onChange={handleChange}></textarea>
+            <textarea id="globalPrompt" name="globalPrompt" className='textarea' placeholder='Enter global prompt' rows={8} value={setting.globalPrompt} onChange={handleChange}></textarea>
         </div>
         }
 
@@ -149,10 +159,10 @@ export default function Prompts({ setIsOpen, docPrompt, setDocPrompt, setting, s
         <li className='rounded-md border border-transparent bg-gray-100 px-4 py-2 text-sm font-medium text-graylue-900 hover:bg-blue-200 hover:text-blue-900 cursor-pointer mt-6' onClick={onCreateAction}>Create custom action</li>
         </ul>
         <div className='w-3/4'>
-            <label for="name" className="text-left text-gray-700">Name</label>
+            <label htmlFor="name" className="text-left text-gray-700">Name</label>
             <input id="name" name='name' className='input' value={setting.actionPrompts[actionIndex].name} onChange={handleAPChange}/>
-            <label for="prompt" className="text-left text-gray-700 mt-2">Action Prompt</label>
-            <textarea id="prompt" name='prompt' className='textarea' placeholder='Enter action prompt' rows="8" value={setting.actionPrompts[actionIndex].prompt} onChange={handleAPChange}/>
+            <label htmlFor="prompt" className="text-left text-gray-700 mt-2">Action Prompt</label>
+            <textarea id="prompt" name='prompt' className='textarea' placeholder='Enter action prompt' rows={8} value={setting.actionPrompts[actionIndex].prompt} onChange={handleAPChange}/>
         </div>
         </div>
         }

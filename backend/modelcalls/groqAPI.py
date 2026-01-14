@@ -1,11 +1,12 @@
 from groq import Groq
 import os
 from dotenv import load_dotenv
-from typing import Dict, List, NamedTuple, Optional, Union
+from typing import Dict, List, NamedTuple, Optional, Union, AsyncIterator, Iterator
 from model.LanguageAPI import _MAX_RETRIES, _TIMEOUT, LanguageAPI, LanguageResponse
 from constants import DEFAULT_SEED, MAX_PARAGRAPH_LENGTH, MAX_PARAGRAPH_LENGTH_CHARACTERS, MAX_PARAGRAPH_LENGTH_SCENES, MAX_RETRIES, SAMPLE_LENGTH, SAMPLING_PROB, SAMPLING_TEMP
 import os
 import sys
+import asyncio
 
 # Get the absolute path to the project root directory
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -94,6 +95,35 @@ class GroqAPI(LanguageAPI):
                                 prompt=prompt,
                                 prompt_length=len(prompt))]
     return results
+
+  def sample_stream(self,
+                    prompt: str,
+                    sample_length: Optional[int] = None,
+                    seed: Optional[int] = None) -> Iterator[str]:
+    """Stream model response with provided prompt.
+
+    Yields text chunks as they are generated.
+    """
+    if sample_length is None:
+      sample_length = self._sample_length
+
+    stream = self._client.chat.completions.create(
+        model=self._model,
+        max_tokens=sample_length,
+        temperature=self._config_sampling['temp'],
+        top_p=self._config_sampling['prob'],
+        messages=[
+          {"role": "system", "content": self._model_param},
+          {"role": "user", "content": prompt}
+        ],
+        stream=True
+    )
+
+    for chunk in stream:
+      if chunk.choices and len(chunk.choices) > 0:
+        delta = chunk.choices[0].delta
+        if delta and delta.content:
+          yield delta.content
 
 
 # Create the config.

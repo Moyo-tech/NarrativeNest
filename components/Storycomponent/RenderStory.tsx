@@ -1,36 +1,60 @@
-import React, { useState } from 'react';
-import axios from 'axios';
-import Storycard from './Storycard'; // Ensure this path matches where your Storycard component is located
+'use client'
 
-// Define the component using TypeScript's Function Component type (React.FC)
+import React, { useState, useCallback } from 'react';
+import Storycard from './Storycard';
+import { API_ENDPOINTS } from "../../lib/config";
+import { consumeStream } from "../../lib/streaming";
+
 const RenderStory: React.FC = () => {
   const [generatedResult, setGeneratedResult] = useState<string>("");
   const [loading, setLoading] = useState(false);
-  const handleRenderStory = async () => {
-    setLoading(true); // Start loading
-    try {
-      // Define the expected shape of your response data using a TypeScript interface
-      interface ApiResponse {
-        script: string;
-      }
+  const [isStreaming, setIsStreaming] = useState(false);
 
-      const response = await axios.post<ApiResponse>("http://localhost:5000/api/renderstory");
-      const { script } = response.data;
-      console.log('the script does generate');
-      setGeneratedResult(script); // Update state with the API response
-      setLoading(false); // End loading
+  const handleRenderStory = async () => {
+    try {
+      setLoading(true);
+      setIsStreaming(true);
+      setGeneratedResult("");
+
+      await consumeStream(
+        API_ENDPOINTS.renderStoryStream,
+        {},
+        {
+          onChunk: (chunk) => {
+            setGeneratedResult((prev) => prev + chunk);
+          },
+          onComplete: () => {
+            setIsStreaming(false);
+            setLoading(false);
+          },
+          onError: (error) => {
+            console.error("Streaming error:", error);
+            setIsStreaming(false);
+            setLoading(false);
+          },
+        }
+      );
     } catch (error) {
       console.error("Error:", error);
+      setIsStreaming(false);
+      setLoading(false);
     }
   };
 
+  const handleContentChange = useCallback((newContent: string) => {
+    setGeneratedResult(newContent);
+  }, []);
+
   return (
-    <Storycard 
-      title={'Scripts'}  
-      generatedResult={generatedResult} 
+    <Storycard
+      title={'Scripts'}
+      generatedResult={generatedResult}
       onRun={handleRenderStory}
       loadingtext='generating scripts...'
       loading={loading}
+      isStreaming={isStreaming}
+      onContentChange={handleContentChange}
+      editable={!isStreaming}
     />
   );
 };

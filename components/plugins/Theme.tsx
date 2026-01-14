@@ -1,3 +1,5 @@
+'use client'
+
 const exampleTheme = {
     ltr: "ltr",
     rtl: "rtl",
