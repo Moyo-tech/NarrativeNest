@@ -926,6 +926,17 @@ async def generate_storyboard(
 # Health Check
 # ============================================================================
 
+@app.get("/")
+async def root():
+    """Root endpoint - API information."""
+    return {
+        "name": "NarrativeNest API",
+        "version": "1.0.0",
+        "status": "healthy",
+        "docs": "/docs"
+    }
+
+
 @app.get("/healthz")
 async def healthz():
     """Health check endpoint."""
