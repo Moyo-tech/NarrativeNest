@@ -71,6 +71,9 @@ export interface BoardState {
 
   // Selection context (text selected in editor when board was triggered)
   selectionContext: string
+
+  // Streaming content (raw text while generating)
+  streamingContent: string
 }
 
 // Board actions for reducer
@@ -79,6 +82,8 @@ export type BoardAction =
   | { type: 'SET_LOADING'; payload: boolean }
   | { type: 'SET_ERROR'; payload: string | null }
   | { type: 'SET_SELECTION_CONTEXT'; payload: string }
+  | { type: 'SET_STREAMING_CONTENT'; payload: string }
+  | { type: 'APPEND_STREAMING_CONTENT'; payload: string }
   // Beat actions
   | { type: 'SET_BEATS'; payload: BeatItem[] }
   | { type: 'ADD_BEAT'; payload: BeatItem }

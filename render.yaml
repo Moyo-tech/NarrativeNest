@@ -1,0 +1,29 @@
+services:
+  # Backend Service (Python Flask)
+  - type: web
+    name: narrativenest-backend
+    runtime: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: python app.py
+    envVars:
+      - key: API_KEY
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false
+    healthCheckPath: /healthz
+
+  # Frontend Service (Next.js)
+  - type: web
+    name: narrativenest-frontend
+    runtime: node
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: BACKEND_URL
+        fromService:
+          type: web
+          name: narrativenest-backend
+          property: host

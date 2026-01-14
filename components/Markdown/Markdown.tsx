@@ -12,7 +12,7 @@ interface MarkdownProps {
 
 const Markdown = memo(function Markdown({ content }: MarkdownProps) {
     return <MemoizedReactMarkdown
-        className="prose dark:prose-invert markdown"
+        className="prose dark:prose-invert markdown max-w-none break-words overflow-wrap-anywhere"
         // remarkPlugins={[remarkGfm, remarkMath]}
         // rehypePlugins={[rehypeMathjax]}
         linkTarget="_blank"
@@ -25,12 +25,13 @@ const Markdown = memo(function Markdown({ content }: MarkdownProps) {
                         key={Math.random()}
                         language={match[1]}
                         style={prism as any}
-                        customStyle={{ margin: 0 }}
+                        customStyle={{ margin: 0, maxWidth: '100%', overflowX: 'auto' }}
+                        wrapLongLines={true}
                     >
                         {String(children).replace(/\n$/, '')}
                     </SyntaxHighlighter>
                 ) : (
-                    <code className={className} {...props}>
+                    <code className={`${className} break-words`} {...props}>
                         {children}
                     </code>
                 );

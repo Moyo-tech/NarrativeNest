@@ -280,10 +280,10 @@ Provide thoughtful suggestions, answer questions about writing craft, help with 
                   )}
                 </div>
                 <div
-                  className={`flex-1 max-w-[85%] ${msg.role === 'user' ? 'text-right' : ''}`}
+                  className={`flex-1 min-w-0 max-w-[85%] ${msg.role === 'user' ? 'text-right' : ''}`}
                 >
                   <div
-                    className={`inline-block p-3 rounded-xl ${
+                    className={`inline-block p-3 rounded-xl break-words overflow-hidden max-w-full ${
                       msg.role === 'user'
                         ? 'bg-accent-700/30 text-white'
                         : 'bg-primary-800/50 text-neutral-200'

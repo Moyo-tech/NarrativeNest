@@ -25,6 +25,7 @@ const initialState: BoardState = {
   dialogues: [],
   characters: [],
   selectionContext: '',
+  streamingContent: '',
 }
 
 // Reducer function
@@ -41,6 +42,12 @@ function boardReducer(state: BoardState, action: BoardAction): BoardState {
 
     case 'SET_SELECTION_CONTEXT':
       return { ...state, selectionContext: action.payload }
+
+    case 'SET_STREAMING_CONTENT':
+      return { ...state, streamingContent: action.payload }
+
+    case 'APPEND_STREAMING_CONTENT':
+      return { ...state, streamingContent: state.streamingContent + action.payload }
 
     // Beat actions
     case 'SET_BEATS':
@@ -224,10 +231,11 @@ export function BeatBoardProvider({ children }: { children: ReactNode }) {
 
       dispatch({ type: 'SET_LOADING', payload: true })
       dispatch({ type: 'SET_ERROR', payload: null })
+      dispatch({ type: 'SET_STREAMING_CONTENT', payload: '' })
 
       try {
         const prompt = buildPromptForMode(mode, context || state.selectionContext)
-        const response = await fetchBoardContent(prompt, mode)
+        const response = await fetchBoardContent(prompt, mode, dispatch)
 
         switch (mode) {
           case 'plot':
@@ -249,12 +257,14 @@ export function BeatBoardProvider({ children }: { children: ReactNode }) {
         }
 
         dispatch({ type: 'SET_LOADING', payload: false })
+        dispatch({ type: 'SET_STREAMING_CONTENT', payload: '' })
       } catch (error) {
         console.error('Failed to generate board content:', error)
         dispatch({
           type: 'SET_ERROR',
           payload: error instanceof Error ? error.message : 'Failed to generate content',
         })
+        dispatch({ type: 'SET_STREAMING_CONTENT', payload: '' })
       }
     },
     [state.selectionContext]
@@ -354,7 +364,11 @@ Create well-rounded characters with depth and clear motivations.`
   }
 }
 
-async function fetchBoardContent(prompt: string, mode: BoardMode): Promise<string> {
+async function fetchBoardContent(
+  prompt: string,
+  mode: BoardMode,
+  dispatch: React.Dispatch<BoardAction>
+): Promise<string> {
   const response = await fetch('/api/writer2', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -390,13 +404,20 @@ async function fetchBoardContent(prompt: string, mode: BoardMode): Promise<strin
   while (true) {
     const { done, value } = await reader.read()
     if (done) break
-    fullContent += decoder.decode(value, { stream: true })
+    const chunk = decoder.decode(value, { stream: true })
+    fullContent += chunk
+
+    // Update streaming content in real-time
+    dispatch({ type: 'APPEND_STREAMING_CONTENT', payload: chunk })
   }
 
   // Final decode to flush any remaining bytes
-  fullContent += decoder.decode()
+  const finalChunk = decoder.decode()
+  fullContent += finalChunk
+  if (finalChunk) {
+    dispatch({ type: 'APPEND_STREAMING_CONTENT', payload: finalChunk })
+  }
 
-  console.log('Generated content:', fullContent)
   return fullContent
 }
 

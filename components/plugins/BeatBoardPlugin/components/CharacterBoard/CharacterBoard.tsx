@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { FiRefreshCw, FiTrash2, FiUsers, FiPlus } from 'react-icons/fi'
 import { useBeatBoard } from '@/context/BeatBoardContext'
 import { CharacterPassport } from './CharacterPassport'
@@ -8,10 +9,19 @@ import { nanoid } from 'nanoid'
 
 export function CharacterBoard({ onInsertToEditor }: BoardProps) {
   const { state, dispatch, generateContent, clearBoard } = useBeatBoard()
-  const { characters, isLoading, error, selectionContext } = state
+  const { characters, isLoading, error, selectionContext, streamingContent } = state
+  const [localLoading, setLocalLoading] = useState(false)
 
-  const handleGenerate = () => {
-    generateContent('characters', selectionContext)
+  // Combined loading state - either local or context
+  const showLoading = localLoading || isLoading
+
+  const handleGenerate = async () => {
+    setLocalLoading(true)
+    try {
+      await generateContent('characters', selectionContext)
+    } finally {
+      setLocalLoading(false)
+    }
   }
 
   const handleClear = () => {
@@ -61,11 +71,11 @@ export function CharacterBoard({ onInsertToEditor }: BoardProps) {
           )}
           <button
             onClick={handleGenerate}
-            disabled={isLoading}
+            disabled={showLoading}
             className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-accent-700/50 text-white hover:bg-accent-600/50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm"
           >
-            <FiRefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
-            {isLoading ? 'Generating...' : characters.length > 0 ? 'More Characters' : 'Generate'}
+            <FiRefreshCw className={`w-4 h-4 ${showLoading ? 'animate-spin' : ''}`} />
+            {showLoading ? 'Generating...' : characters.length > 0 ? 'More Characters' : 'Generate'}
           </button>
         </div>
       </div>
@@ -79,7 +89,71 @@ export function CharacterBoard({ onInsertToEditor }: BoardProps) {
 
       {/* Content */}
       <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
-        {isLoading && characters.length === 0 ? (
+        {/* Loading indicator - shows immediately when generating */}
+        {showLoading && (
+          <div
+            style={{
+              background: 'linear-gradient(135deg, rgba(147, 51, 234, 0.3) 0%, rgba(79, 70, 229, 0.2) 100%)',
+              border: '2px solid #9333ea',
+              borderRadius: '12px',
+              padding: '16px',
+              marginBottom: '16px',
+              boxShadow: '0 0 30px rgba(147, 51, 234, 0.4)',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div
+                style={{
+                  width: '32px',
+                  height: '32px',
+                  border: '3px solid rgba(147, 51, 234, 0.3)',
+                  borderTopColor: '#9333ea',
+                  borderRadius: '50%',
+                  animation: 'spin 1s linear infinite',
+                }}
+              />
+              <div style={{ flex: 1 }}>
+                <span style={{ color: '#c084fc', fontWeight: 600, fontSize: '14px' }}>
+                  {streamingContent ? '👤 Creating character profiles...' : '⏳ Starting character generation...'}
+                </span>
+                {streamingContent && (
+                  <p style={{ color: '#a1a1aa', fontSize: '12px', marginTop: '4px' }}>
+                    {streamingContent.length} characters received
+                  </p>
+                )}
+              </div>
+            </div>
+            {streamingContent && (
+              <div style={{ marginTop: '12px', paddingTop: '12px', borderTop: '1px solid rgba(147, 51, 234, 0.3)' }}>
+                <div
+                  style={{
+                    color: '#e5e5e5',
+                    fontSize: '13px',
+                    fontFamily: 'monospace',
+                    whiteSpace: 'pre-wrap',
+                    wordBreak: 'break-word',
+                    maxHeight: '200px',
+                    overflowY: 'auto',
+                  }}
+                >
+                  {streamingContent}
+                  <span
+                    style={{
+                      display: 'inline-block',
+                      width: '8px',
+                      height: '16px',
+                      backgroundColor: '#9333ea',
+                      marginLeft: '4px',
+                      animation: 'pulse 1s infinite',
+                    }}
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {showLoading && characters.length === 0 && !streamingContent ? (
           // Loading shimmer
           <div className="space-y-4">
             {[1, 2].map((i) => (
@@ -101,7 +175,7 @@ export function CharacterBoard({ onInsertToEditor }: BoardProps) {
               </div>
             ))}
           </div>
-        ) : characters.length === 0 ? (
+        ) : !showLoading && characters.length === 0 ? (
           // Empty state
           <div className="flex flex-col items-center justify-center h-full text-center py-12">
             <div className="w-16 h-16 rounded-full bg-primary-800/50 flex items-center justify-center mb-4">
