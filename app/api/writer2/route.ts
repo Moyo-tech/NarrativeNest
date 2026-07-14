@@ -33,8 +33,8 @@ async function inference(messages: any[], apiKey: string, modelId: string, tempe
     geminiContents.push(...filteredContents);
   }
 
-  // Use gemini-2.0-flash as default model
-  const geminiModel = "gemini-2.0-flash";
+  // Use gemini-3.1-flash-lite as default model
+  const geminiModel = "gemini-3.1-flash-lite";
 
   const payload = JSON.stringify({
     contents: geminiContents,
@@ -160,7 +160,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    const stream = await inference(messages, apiKey, modelId || 'gemini-2.0-flash', temperature, maxTokens);
+    const stream = await inference(messages, apiKey, modelId || 'gemini-3.1-flash-lite', temperature, maxTokens);
 
     return new Response(stream, {
       headers: { 'Transfer-Encoding': 'chunked' }

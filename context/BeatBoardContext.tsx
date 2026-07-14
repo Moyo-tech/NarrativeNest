@@ -380,7 +380,7 @@ async function fetchBoardContent(
         },
         { role: 'user', content: prompt },
       ],
-      modelId: 'gemini-2.0-flash',
+      modelId: 'gemini-3.1-flash-lite',
       temperature: 0.8,
       maxTokens: 2000, // Higher limit for beat board content generation
     }),

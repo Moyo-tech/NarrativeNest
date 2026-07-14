@@ -1,7 +1,9 @@
 /** @type {import('next').NextConfig} */
 
-// Backend URL - defaults to localhost for development
-const backendUrl = process.env.BACKEND_URL || 'http://localhost:5000';
+// Backend URL - use NEXT_PUBLIC_BACKEND_URL for build-time configuration
+// For development: BACKEND_URL (in .env.local)
+// For production: NEXT_PUBLIC_BACKEND_URL (in Vercel settings)
+const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || process.env.BACKEND_URL || 'http://localhost:5001';
 
 const nextConfig = {
   reactStrictMode: true,

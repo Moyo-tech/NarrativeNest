@@ -39,7 +39,7 @@ Your ability to adhere to instructions meticulously is paramount. You are highly
 
     try:
         model = genai.GenerativeModel(
-            model_name="gemini-2.0-flash",
+            model_name="gemini-3.1-flash-lite",
             system_instruction=system_prompt,
             generation_config=genai.GenerationConfig(
                 max_output_tokens=1024,

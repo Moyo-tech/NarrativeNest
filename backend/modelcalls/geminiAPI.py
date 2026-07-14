@@ -23,7 +23,7 @@ load_dotenv()
 
 # Gemini configuration
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-GEMINI_MODEL_NAME = "gemini-2.0-flash"  # Fast and capable model
+GEMINI_MODEL_NAME = "gemini-3.1-flash-lite"  # Fast and capable model
 GEMINI_SYSTEM_PROMPT = (
     "You are a creative writing assistant for a team of writers. "
     "Your goal is to expand on the input text prompt and to generate the continuation "

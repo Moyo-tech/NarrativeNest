@@ -4,7 +4,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import type { TaskType } from "@/types/data";
 
 // Gemini API endpoint
-const GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
+const GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent";
 
 export default async function handler(
   req: NextApiRequest,

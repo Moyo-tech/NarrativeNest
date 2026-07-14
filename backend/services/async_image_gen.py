@@ -58,7 +58,7 @@ async def generate_single_image(prompt: str) -> Optional[str]:
             # Fallback: Try using Gemini's multimodal model to describe what the image would look like
             # This is a graceful degradation if Imagen is not available
             try:
-                model = genai.GenerativeModel("gemini-2.0-flash")
+                model = genai.GenerativeModel("gemini-3.1-flash-lite")
                 response = model.generate_content(
                     f"Create a detailed visual description for this image prompt: {prompt}"
                 )

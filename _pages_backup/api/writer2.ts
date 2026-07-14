@@ -35,8 +35,8 @@ async function inference(messages: any[], apiKey: string, modelId: string, tempe
     geminiContents.push(...filteredContents);
   }
 
-  // Use gemini-2.0-flash as default model
-  const geminiModel = "gemini-2.0-flash";
+  // Use gemini-3.1-flash-lite as default model
+  const geminiModel = "gemini-3.1-flash-lite";
 
   const payload = JSON.stringify({
     contents: geminiContents,

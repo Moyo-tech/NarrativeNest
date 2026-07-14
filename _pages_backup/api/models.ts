@@ -29,10 +29,10 @@ export default async function handler(req: any, res: any) {
     const models = data.models
       ?.filter((m: any) =>
         m.supportedGenerationMethods?.includes("generateContent") &&
-        (m.name.includes("gemini-2.0") || m.name.includes("gemini-1.5"))
+        (m.name.includes("gemini-3.1-flash-lite") || m.name.includes("gemini-3.1-flash-lite"))
       )
       .map((m: any) => m.name.replace("models/", ""))
-      .slice(0, 5) || ["gemini-2.0-flash", "gemini-1.5-flash"];
+      .slice(0, 5) || ["gemini-3.1-flash-lite", "gemini-3.1-flash-lite"];
 
     return res.status(200).json(models);
   } catch (error) {
