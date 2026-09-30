@@ -11,6 +11,10 @@ NarrativeNest is an AI-assisted writing workspace for Nollywood stories. It brin
 
 The product goal is to give writers more control over an AI-assisted workflow: generated material is an editable draft inside the writing environment, rather than a finished screenplay. The separation between the editor, writer route, and generation service makes those roles explicit.
 
+## My contribution
+
+I designed and built the Lexical editor and its AI writing interactions, connected the Next.js interface to model-backed writing flows, and rewrote the story-generation backend from Flask to FastAPI. That backend change introduced per-session state so concurrent writers do not share one story state.
+
 ## Architecture
 
 ```text
