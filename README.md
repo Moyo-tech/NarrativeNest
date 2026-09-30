@@ -1,256 +1,62 @@
 # NarrativeNest
 
-**AI-Powered Storytelling for Nollywood**
+NarrativeNest is an AI-assisted writing workspace for Nollywood stories. It brings a rich-text editor and structured story generation together so writers can develop a logline into characters, scenes, places, and dialogue while reviewing and revising the output. Its prompts account for Nigerian storytelling contexts, including Nigerian Pidgin, Yoruba, and Igbo dialogue suggestions. Generated text needs a writer's judgment; cultural and language quality is not independently evaluated here.
 
-NarrativeNest is a professional writing application designed specifically for Nollywood screenwriters and storytellers. It combines a powerful rich-text editor with hierarchical AI-powered story generation to help you craft compelling narratives from concept to completion.
+## What the repository contains
 
-![NarrativeNest](public/favicon-white.png)
+- A Next.js and TypeScript interface with a Lexical editor, formatting tools, focused writing modes, and contextual writing actions.
+- A Next.js writer route that calls Gemini for selected-text elaboration, rewriting, and dialogue suggestions.
+- A Python FastAPI service for hierarchical story generation and image-prompt/storyboard workflows. The service holds generation state in sessions and exposes health and generation endpoints.
+- Configuration for local development and deployment. The frontend proxies backend requests to the Python service.
 
-## Features
+The product goal is to give writers more control over an AI-assisted workflow: generated material is an editable draft inside the writing environment, rather than a finished screenplay. The separation between the editor, writer route, and generation service makes those roles explicit.
 
-### Rich Text Editor
-- **Lexical-based Editor**: Professional-grade editing experience with advanced formatting
-- **AI Writing Assistant**: Real-time suggestions for elaboration, rewriting, dialogue, and tone adjustments
-- **Distraction-Free Mode**: Focus mode to eliminate UI distractions
-- **Slash Commands**: Quick access to AI-powered writing tools
-- **Magic Wand**: Contextual AI suggestions based on your selection
-- **Typewriter Mode**: Keep your cursor centered for a focused writing experience
+## Architecture
 
-### Hierarchical Story Generation
-Generate complete stories layer by layer:
-1. **Storyline** → Define your core concept
-2. **Title** → AI generates compelling titles
-3. **Characters** → Develop character descriptions and arcs
-4. **Scenes** → Break down your story into structured scenes
-5. **Places** → Create detailed location descriptions
-6. **Dialogues** → Generate authentic character conversations
-
-### Nollywood-Focused
-- Support for Nigerian cultural contexts
-- Dialogue generation in Nigerian Pidgin, Yoruba, and Igbo
-- Genre templates: Drama, Comedy, and Folktales
-- Made specifically for African storytelling
-
-## Getting Started
-
-### Prerequisites
-- Node.js 16.x or higher
-- Python 3.8 or higher
-- OpenAI API key (for frontend AI features)
-- Groq API key (for backend story generation)
-
-### Frontend Setup
-
-1. Clone the repository:
-```bash
-git clone https://github.com/yourusername/narrativenest.git
-cd narrativenest
+```text
+Writer → Next.js interface + Lexical editor
+                    ├── /api/writer → Gemini text suggestions
+                    └── proxied generation routes → FastAPI service
+                                                   ├── story entities and prompts
+                                                   ├── model adapters
+                                                   └── session state
 ```
 
-2. Install dependencies:
-```bash
-npm install
-```
+Relevant code lives in `app/`, `components/editor/`, `app/api/writer/`, `backend/app.py`, and `backend/`. The backend includes provider adapters and image generation utilities. See the code for the current route list; the provider and deployment configuration has changed over the project's history.
 
-3. Set up environment variables:
-```bash
-export OPENAI_API_KEY="your-openai-api-key"
-# Optional: Use a custom OpenAI-compatible endpoint
-export OPENAI_BASE_URL="https://api.openai.com/v1"
-```
+## Run locally
 
-4. Run the development server:
+Use Node.js 20 (see `.nvmrc`) and Python 3.8 or newer. AI features require your own provider credentials; never commit real keys.
+
 ```bash
+git clone https://github.com/Moyo-tech/NarrativeNest.git
+cd NarrativeNest
+npm ci
+cp .env.example .env.local
 npm run dev
 ```
 
-5. Open [http://localhost:3000](http://localhost:3000) in your browser
+Set `GEMINI_API_KEY` in `.env.local` for the current Next.js writer route. The development interface is at `http://localhost:3000`.
 
-### Backend Setup
+For the story-generation service, use another terminal:
 
-The backend provides hierarchical story generation capabilities.
-
-1. Navigate to the backend directory:
 ```bash
-cd backend
-```
-
-2. Install Python dependencies:
-```bash
+cd NarrativeNest/backend
+python3 -m venv .venv
+source .venv/bin/activate
 pip install -r requirements.txt
-```
-
-3. Set up environment variables:
-```bash
-export API_KEY="your-groq-api-key"
-# or
-export GROQ_API_KEY="your-groq-api-key"
-```
-
-4. Run the Flask server:
-```bash
 python app.py
 ```
 
-The backend will run on `http://localhost:5000` and is automatically proxied by the Next.js development server.
+The service defaults to port 5000. Set `BACKEND_URL=http://localhost:5000` in the frontend environment if needed; `next.config.js` also supports `NEXT_PUBLIC_BACKEND_URL`. Provider credentials required by a particular backend adapter must be set in that service's environment. The checked-in dependency and deployment files may need reconciliation before every backend workflow runs; this setup has not been verified end to end in the current audit.
 
-## Production Deployment
+## Technical decisions
 
-### Build for Production
+- **Lexical** keeps writing and editing in one interface with composable editor plugins.
+- **Separate Next.js and Python services** keep UI interactions and hierarchical generation logic distinct.
+- **Session-based generation state** lets a writer progress through story elements rather than requesting an entire script at once.
+- **Prompted cultural context** is part of the product design, but the repository does not establish reliable cultural fidelity or language accuracy.
 
-```bash
-npm run build
-npm start
-```
+## Status and limits
 
-The production server runs on port 8080.
-
-### Docker Deployment
-
-```bash
-docker build -t narrativenest .
-docker run -p 8080:8080 narrativenest
-```
-
-### Kubernetes Deployment
-
-Using Skaffold:
-```bash
-skaffold dev
-```
-
-### Deploy to Vercel
-
-The project is optimized for Vercel deployment:
-
-1. Connect your GitHub repository to Vercel
-2. Set environment variables in Vercel dashboard:
-   - `OPENAI_API_KEY`
-   - `BACKEND_URL` (your Flask backend URL)
-3. Deploy
-
-**Note**: Old `/narrativenest/*` URLs automatically redirect to the new paths for backward compatibility.
-
-## Project Structure
-
-```
-narrativenest/
-├── app/                          # Next.js App Router pages
-│   ├── (dashboard)/             # Dashboard layout group
-│   │   ├── editor/              # Main editor page
-│   │   ├── settings/            # Settings page
-│   │   └── newvisualise/        # Story visualization (in development)
-│   ├── login/                   # Authentication pages
-│   ├── signup/
-│   └── layout.tsx               # Root layout
-├── components/                   # React components
-│   ├── editor/                  # Editor components
-│   ├── layout/                  # Layout components (Shell, etc.)
-│   ├── onboarding/              # Onboarding flow
-│   ├── plugins/                 # Lexical editor plugins
-│   ├── settings/                # Settings components
-│   └── ui/                      # Reusable UI components
-├── context/                      # React Context providers
-├── lib/                         # Utility functions and configurations
-├── backend/                      # Python Flask backend
-│   ├── entities/                # Story entity models
-│   ├── model/                   # LLM API interfaces
-│   ├── modelcalls/              # LLM implementations (Groq, Gemini)
-│   ├── prefixes/                # Story generation prompts
-│   ├── image_gen/               # Image generation utilities
-│   └── app.py                   # Flask application
-├── public/                       # Static assets
-└── styles/                       # Global styles
-```
-
-## Technology Stack
-
-### Frontend
-- **Framework**: Next.js 13.5.6 (App Router)
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS
-- **Editor**: Lexical (Facebook's extensible text editor)
-- **UI Components**: Custom components + Material-UI
-- **Animations**: Framer Motion
-- **State Management**: React Context
-
-### Backend
-- **Framework**: Flask (Python)
-- **LLM**: Groq (Mixtral-8x7b-32768)
-- **Image Generation**: Replicate API
-- **Additional**: Gemini API support
-
-## API Routes
-
-### Frontend API Routes (Next.js)
-- `/api/writer` - AI writing assistance (elaborate, rewrite, suggestions)
-- `/api/writer2` - Additional writing tools
-- `/api/models` - Model configuration
-
-### Backend API Routes (Flask)
-All routes are proxied through Next.js:
-- `/api/generate-title` - Generate story titles
-- `/api/generate-characters` - Generate character descriptions
-- `/api/generate-scenes` - Generate scene breakdowns
-- `/api/generate-dialogue` - Generate dialogues
-- `/api/generate-prompts` - Generate image prompts
-- `/api/generate-images` - Generate images from prompts
-- `/api/render-story` - Render complete story
-
-## Environment Variables
-
-### Frontend
-| Variable | Description | Required |
-|----------|-------------|----------|
-| `OPENAI_API_KEY` | OpenAI API key for AI writing features | Yes |
-| `OPENAI_BASE_URL` | Custom OpenAI-compatible endpoint | No |
-| `BACKEND_URL` | Flask backend URL (production only) | No |
-
-### Backend
-| Variable | Description | Required |
-|----------|-------------|----------|
-| `API_KEY` or `GROQ_API_KEY` | Groq API key for story generation | Yes |
-
-## Features in Detail
-
-### AI Writing Assistant
-- **Elaborate**: Expand selected text with more detail
-- **Rewrite**: Rephrase content while maintaining meaning
-- **Make Shorter/Longer**: Adjust text length
-- **Tone Adjustment**: Change tone (formal, casual, dramatic, etc.)
-- **Dialogue Suggestions**: Generate character dialogue
-- **Nigerian Language Support**: Generate dialogue in Pidgin, Yoruba, or Igbo
-
-### Story Generation Workflow
-1. Enter your logline (story concept)
-2. Select a genre prefix (Drama, Comedy, or Folktales)
-3. Click "Write" to begin hierarchical generation
-4. Review and refine each layer of your story
-5. Export or continue editing in the rich text editor
-
-### Editor Plugins
-- **Toolbar Plugin**: Rich formatting options
-- **Copilot Plugin**: AI-powered writing suggestions
-- **Slash Command Plugin**: Quick access to AI tools via `/` commands
-- **Magic Wand Plugin**: Contextual AI actions on selected text
-- **Draggable Block Plugin**: Reorder content blocks
-- **Code Highlight Plugin**: Syntax highlighting for code blocks
-- **Typewriter Mode Plugin**: Centered cursor mode
-- **Beat Board Plugin**: Story beat organization
-- **Director Lens Plugin**: Scene visualization tools
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## License
-
-This project is licensed under the MIT License.
-
-## Support
-
-For issues and questions, please open an issue on GitHub.
-
----
-
-**Made for Nollywood** 🎬
+This is an evolving product repository. Model output may be incorrect, generic, or culturally inaccurate. The README does not claim user adoption, measured writing gains, or validated AI quality. The local and deployment configurations need an end-to-end check before treating the service as production ready. The repository's `LICENSE` file is GPL-3.0.
